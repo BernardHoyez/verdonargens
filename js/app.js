@@ -1,7 +1,7 @@
 /* app.js — Rando Var PWA
-   Les données sont chargées depuis window.SORTIES_DATA
-   injecté directement dans index.html (pas de fetch, fonctionne
-   en local, sur GitHub Pages, et hors connexion). */
+   Fetch simple avec chemin relatif : fonctionne partout.
+   La balise <base href="./"> dans index.html résout les chemins
+   aussi bien en local qu'sur GitHub Pages. */
 
 let allSorties = [];
 let currentFilter = 'tous';
@@ -23,15 +23,49 @@ function fmtMon(iso) {
   return mois[parseInt(iso.split('-')[1]) - 1];
 }
 function badgeHtml(d) {
-  const map = { facile:['badge-facile','Facile'], moyen:['badge-moyen','Moyen'], difficile:['badge-difficile','Difficile'] };
-  const [cls, lbl] = map[d] || ['badge-moyen','?'];
+  const map = {
+    facile:    ['badge-facile',    'Facile'],
+    moyen:     ['badge-moyen',     'Moyen'],
+    difficile: ['badge-difficile', 'Difficile']
+  };
+  const [cls, lbl] = map[d] || ['badge-moyen', '?'];
   return `<span class="badge ${cls}">${lbl}</span>`;
 }
 function isFuture(iso) {
-  const today = new Date(); today.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
   return new Date(iso + 'T00:00:00') >= today;
 }
 function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+/* ===== CHARGEMENT ===== */
+async function loadSorties() {
+  /* Chemin relatif — résolu par <base href="./"> dans index.html */
+  const urls = [
+    'sorties/2025.json',
+    './sorties/2025.json',
+    location.origin + location.pathname.replace(/\/[^/]*$/, '/') + 'sorties/2025.json'
+  ];
+
+  let data = null;
+  for (const url of urls) {
+    try {
+      const r = await fetch(url, { cache: 'no-store' });
+      if (r.ok) { data = await r.json(); console.log('[Rando Var] Chargé depuis :', url); break; }
+    } catch(e) { console.warn('[Rando Var] Échec :', url, e.message); }
+  }
+
+  if (!data) {
+    document.getElementById('hero-eyebrow').textContent = 'Erreur de chargement';
+    document.getElementById('hero-title').textContent   = 'Impossible de lire sorties/2025.json';
+    document.getElementById('hero-sub').textContent     = 'Vérifiez que le fichier existe dans le dépôt.';
+    return;
+  }
+
+  allSorties = data;
+  console.log('[Rando Var]', allSorties.length, 'sorties chargées.');
+  renderAccueil();
+  renderAgenda();
+}
 
 /* ===== NAVIGATION ===== */
 function navTo(id) {
@@ -42,10 +76,10 @@ function navTo(id) {
 
   const map = { accueil:'s-accueil', agenda:'s-agenda', carte:'s-carte', infos:'s-infos' };
   const titles = {
-    's-accueil':{ title:'Rando Var',  sub:'Club de randonnée de Carcès' },
-    's-agenda': { title:'Agenda',      sub:'Sorties à venir' },
-    's-carte':  { title:'Carte',       sub:'Randonnées du Var' },
-    's-infos':  { title:'Infos',       sub:'Club & ressources' }
+    's-accueil': { title:'Rando Var',  sub:'Club de randonnée de Carcès' },
+    's-agenda':  { title:'Agenda',     sub:'Sorties à venir' },
+    's-carte':   { title:'Carte',      sub:'Randonnées du Var' },
+    's-infos':   { title:'Infos',      sub:'Club & ressources' }
   };
   const sid = map[id] || id;
   const el  = document.getElementById(sid);
@@ -106,7 +140,7 @@ function renderAccueil() {
 
   const nc = document.getElementById('next-cards');
   nc.innerHTML = futures.length > 1
-    ? futures.slice(1,4).map(s => cardHtml(s)).join('')
+    ? futures.slice(1, 4).map(s => cardHtml(s)).join('')
     : '<div style="padding:16px;font-size:13px;color:#aaa;">Aucune autre sortie planifiée.</div>';
 
   const lc = document.getElementById('last-card');
@@ -125,15 +159,16 @@ function renderAgenda() {
 
   const byMonth = {};
   filtered.forEach(s => {
-    const k = s.date.slice(0,7);
+    const k = s.date.slice(0, 7);
     if (!byMonth[k]) byMonth[k] = [];
     byMonth[k].push(s);
   });
 
-  const moisNoms = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  const moisNoms = ['','Janvier','Février','Mars','Avril','Mai','Juin',
+                    'Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
   let html = '';
   Object.entries(byMonth).forEach(([k, sorties]) => {
-    const [y,m] = k.split('-');
+    const [y, m] = k.split('-');
     html += `<div class="section-title">${moisNoms[parseInt(m)]} ${y}</div>`;
     html += sorties.map(s => cardHtml(s)).join('');
   });
@@ -169,10 +204,11 @@ function showDetail(s) {
   const cov = document.getElementById('d-covoit');
   cov.textContent = s.covoiturage ? 'Disponible' : 'Non prévu';
   cov.style.color = s.covoiturage ? '#1D9E75' : '#888';
-  document.getElementById('d-pts').innerHTML          = (s.points_remarquables||[]).map(p=>`<span class="pt-pill">${p}</span>`).join('');
-  document.getElementById('d-av').textContent         = s.animateur.split(' ').map(w=>w[0]).join('').toUpperCase();
-  document.getElementById('d-anim-name').textContent  = s.animateur;
-  document.getElementById('d-anim-tel').textContent   = s.telephone || '';
+  document.getElementById('d-pts').innerHTML =
+    (s.points_remarquables || []).map(p => `<span class="pt-pill">${p}</span>`).join('');
+  document.getElementById('d-av').textContent        = s.animateur.split(' ').map(w => w[0]).join('').toUpperCase();
+  document.getElementById('d-anim-name').textContent = s.animateur;
+  document.getElementById('d-anim-tel').textContent  = s.telephone || '';
   document.getElementById('screen').scrollTop = 0;
 }
 function hideDetail() {
@@ -180,7 +216,7 @@ function hideDetail() {
   navTo('accueil');
 }
 
-/* ===== FORMULAIRE ANIMATEUR ===== */
+/* ===== FORMULAIRE ===== */
 function openFormulaire() {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('detail-screen').classList.remove('active');
@@ -197,30 +233,9 @@ function closeFormulaire() {
 
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', () => {
-  /* Données injectées dans index.html via <script id="sorties-data"> */
-  const dataEl = document.getElementById('sorties-data');
-  if (dataEl) {
-    try {
-      allSorties = JSON.parse(dataEl.textContent);
-      console.log('[Rando Var] ' + allSorties.length + ' sorties chargées (inline).');
-    } catch(e) {
-      console.error('[Rando Var] Erreur parsing sorties-data :', e);
-    }
-  }
-
-  /* Fallback : tentative fetch (GitHub Pages servi en HTTP) */
-  if (allSorties.length === 0 && location.protocol !== 'file:') {
-    fetch('sorties/2025.json')
-      .then(r => r.json())
-      .then(data => { allSorties = data; renderAccueil(); renderAgenda(); })
-      .catch(e => console.error('[Rando Var] Fetch fallback échoué :', e));
-  }
-
   navTo('accueil');
-  renderAccueil();
-  renderAgenda();
+  loadSorties();
 
-  /* Service Worker — uniquement en HTTP/HTTPS */
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js')
       .then(r => console.log('[SW] scope:', r.scope))
