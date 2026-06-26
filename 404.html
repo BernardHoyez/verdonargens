@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rando Var</title>
+  <script>
+    /* Redirect SPA : GitHub Pages renvoie 404 sur les URLs directes.
+       Ce script redirige vers index.html en conservant le chemin. */
+    const path = window.location.pathname;
+    const base = '/verdonargens';
+    const target = path.startsWith(base) ? path : base + '/';
+    sessionStorage.setItem('redirect', target + window.location.search);
+    window.location.replace(base + '/');
+  </script>
+</head>
+<body></body>
+</html>

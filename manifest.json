@@ -1,0 +1,26 @@
+{
+  "name": "Rando Var — Club de Carcès",
+  "short_name": "Rando Var",
+  "description": "Application du club de randonnée de Carcès (Var)",
+  "start_url": "/verdonargens/",
+  "scope": "/verdonargens/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1D9E75",
+  "orientation": "portrait-primary",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/verdonargens/icons/icon192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/verdonargens/icons/icon512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
