@@ -101,4 +101,21 @@
     "telephone": "06 45 67 89 01",
     "trace_gpx": "traces/passees/2025-06-08-mont-coudon.gpx"
   }
+  {
+"id": "2026-09-06-tour-de-bauduen",
+"date": "2026-09-06",
+"intitule": "Tour de Bauduen",
+"difficulte": "moyen",
+"distance_km": 14,
+"denivele_m": 360,
+"points_remarquables": [],
+"depart_carces": "08:00",
+"depart_rando": "09:00",
+"point_depart": "Parking du village",
+"distance_ar_km": 80,
+"covoiturage": true,
+"animateur": "Raymonde",
+"telephone": "0643886963",
+"trace_gpx": "traces/futures/2026-09-06-tour-de-bauduen.gpx"
+}
 ]
