@@ -1,23 +1,22 @@
 /* Service Worker — Rando Var
-   Stratégie brise-cache : modifier CACHE_VERSION à chaque déploiement
-   pour invalider tous les caches clients automatiquement. */
+   Chemins relatifs : fonctionne sur GitHub Pages ET en local.
+   Brise-cache : incrémenter CACHE_VERSION à chaque déploiement. */
 
-const CACHE_VERSION = 'v1.0.0';
-const CACHE_NAME = 'rando-var-' + CACHE_VERSION;
+const CACHE_VERSION = 'v1.0.2';
+const CACHE_NAME    = 'rando-var-' + CACHE_VERSION;
 
 const STATIC_ASSETS = [
-  '/verdonargens/',
-  '/verdonargens/index.html',
-  '/verdonargens/manifest.json',
-  '/verdonargens/css/app.css',
-  '/verdonargens/js/app.js',
-  '/verdonargens/js/formulaire.js',
-  '/verdonargens/sorties/2025.json',
-  '/verdonargens/icons/icon192.png',
-  '/verdonargens/icons/icon512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './css/app.css',
+  './js/app.js',
+  './js/formulaire.js',
+  './sorties/2025.json',
+  './icons/icon192.png',
+  './icons/icon512.png'
 ];
 
-/* Installation : mise en cache des assets statiques */
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -26,40 +25,26 @@ self.addEventListener('install', event => {
   );
 });
 
-/* Activation : suppression des anciens caches (brise-cache) */
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(key => key.startsWith('rando-var-') && key !== CACHE_NAME)
-          .map(key => {
-            console.log('[SW] Suppression ancien cache :', key);
-            return caches.delete(key);
-          })
-      )
-    ).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => Promise.all(
+        keys.filter(k => k.startsWith('rando-var-') && k !== CACHE_NAME)
+            .map(k => { console.log('[SW] Suppression cache:', k); return caches.delete(k); })
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
-/* Fetch : Cache-first pour assets statiques, Network-first pour JSON */
 self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
+  /* Ignorer les requêtes externes (uMap, CDN) */
+  if (!event.request.url.includes(self.location.origin)) return;
 
-  /* Laisser passer les requêtes externes (uMap, CDN) */
-  if (!url.origin.includes('github.io') && !url.pathname.startsWith('/verdonargens')) {
-    return;
-  }
-
-  /* Network-first pour les données JSON (sorties) */
-  if (url.pathname.endsWith('.json')) {
+  /* Network-first pour le JSON des sorties */
+  if (event.request.url.endsWith('.json')) {
     event.respondWith(
       fetch(event.request)
-        .then(response => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          return response;
-        })
+        .then(r => { const c = r.clone(); caches.open(CACHE_NAME).then(ca => ca.put(event.request, c)); return r; })
         .catch(() => caches.match(event.request))
     );
     return;
@@ -69,11 +54,7 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(cached => cached || fetch(event.request)
-        .then(response => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          return response;
-        })
+        .then(r => { const c = r.clone(); caches.open(CACHE_NAME).then(ca => ca.put(event.request, c)); return r; })
       )
   );
 });

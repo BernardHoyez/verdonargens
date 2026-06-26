@@ -1,4 +1,4 @@
-@gmail.com/* formulaire.js — Espace animateur : saisie d'une nouvelle randonnée */
+/* formulaire.js — Espace animateur : saisie d'une nouvelle randonnée */
 
 let fStep = 0;
 let fDiff = '';
