@@ -5,7 +5,7 @@ let fDiff = '';
 let fCovoit = true;
 let fPts = [];
 
-const WEBMASTER_EMAIL = 'webmaster@clubrando.fr';
+const WEBMASTER_EMAIL = 'bhoyez@gmail.com';
 const stepLabels = [
   '<strong>Étape 1/3</strong> — La randonnée',
   '<strong>Étape 2/3</strong> — Logistique & animateur',
