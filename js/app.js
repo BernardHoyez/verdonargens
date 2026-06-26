@@ -1,11 +1,24 @@
 /* app.js — Rando Var PWA
-   Fetch simple avec chemin relatif : fonctionne partout.
-   La balise <base href="./"> dans index.html résout les chemins
-   aussi bien en local qu'sur GitHub Pages. */
+   Fetch robuste : construit l'URL depuis location.href
+   pour fonctionner sur GitHub Pages ET en local. */
 
 let allSorties = [];
 let currentFilter = 'tous';
 window._sortieIndex = [];
+
+/* ===== CONSTRUCTION URL JSON ===== */
+function getJsonUrl() {
+  /* On construit le chemin absolu vers sorties/2025.json
+     en partant de l'URL de la page courante.
+     Ex : https://bernardhoyez.github.io/verdonargens/index.html
+     →   https://bernardhoyez.github.io/verdonargens/sorties/2025.json */
+  let base = location.href;
+  /* Supprimer query string et hash */
+  base = base.split('?')[0].split('#')[0];
+  /* Supprimer le fichier final (index.html ou autre) */
+  base = base.substring(0, base.lastIndexOf('/') + 1);
+  return base + 'sorties/2025.json';
+}
 
 /* ===== UTILITAIRES ===== */
 function fmtDate(iso) {
@@ -39,32 +52,23 @@ function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
 
 /* ===== CHARGEMENT ===== */
 async function loadSorties() {
-  /* Chemin relatif — résolu par <base href="./"> dans index.html */
-  const urls = [
-    'sorties/2025.json',
-    './sorties/2025.json',
-    location.origin + location.pathname.replace(/\/[^/]*$/, '/') + 'sorties/2025.json'
-  ];
+  const url = getJsonUrl();
+  console.log('[Rando Var] Fetch :', url);
 
-  let data = null;
-  for (const url of urls) {
-    try {
-      const r = await fetch(url, { cache: 'no-store' });
-      if (r.ok) { data = await r.json(); console.log('[Rando Var] Chargé depuis :', url); break; }
-    } catch(e) { console.warn('[Rando Var] Échec :', url, e.message); }
+  try {
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status + ' pour ' + url);
+    allSorties = await r.json();
+    console.log('[Rando Var]', allSorties.length, 'sorties chargées.');
+    renderAccueil();
+    renderAgenda();
+  } catch(e) {
+    console.error('[Rando Var] Erreur :', e.message);
+    document.getElementById('hero-eyebrow').textContent = '⚠ Erreur de chargement';
+    document.getElementById('hero-title').textContent   = e.message;
+    document.getElementById('hero-sub').textContent     = 'URL tentée : ' + url;
+    document.getElementById('hero-chips').innerHTML     = '';
   }
-
-  if (!data) {
-    document.getElementById('hero-eyebrow').textContent = 'Erreur de chargement';
-    document.getElementById('hero-title').textContent   = 'Impossible de lire sorties/2025.json';
-    document.getElementById('hero-sub').textContent     = 'Vérifiez que le fichier existe dans le dépôt.';
-    return;
-  }
-
-  allSorties = data;
-  console.log('[Rando Var]', allSorties.length, 'sorties chargées.');
-  renderAccueil();
-  renderAgenda();
 }
 
 /* ===== NAVIGATION ===== */
