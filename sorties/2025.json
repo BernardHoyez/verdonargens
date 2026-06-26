@@ -101,4 +101,21 @@
     "telephone": "06 45 67 89 01",
     "trace_gpx": "traces/passees/2025-06-08-mont-coudon.gpx"
   }
+  {
+"id": "2026-07-12-bauduen",
+"date": "2026-07-12",
+"intitule": "Bauduen",
+"difficulte": "moyen",
+"distance_km": 14,
+"denivele_m": 300,
+"points_remarquables": [],
+"depart_carces": "09:00",
+"depart_rando": "10:00",
+"point_depart": "Parking",
+"distance_ar_km": 40,
+"covoiturage": true,
+"animateur": "Bernard",
+"telephone": "0617547654",
+"trace_gpx": "traces/futures/2026-07-12-bauduen.gpx"
+} 
 ]
