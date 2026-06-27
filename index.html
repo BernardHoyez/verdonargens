@@ -14,7 +14,7 @@
   <title>Rando Var — Club de Carcès</title>
 
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/icon192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon192.png">
 
   <!-- Tabler Icons -->
@@ -28,9 +28,13 @@
 
   <!-- ===== TOPBAR ===== -->
   <div id="topbar">
-    <div>
-      <div id="topbar-title">Rando Var</div>
-      <div id="topbar-sub">Club de randonnée de Carcès</div>
+    <div style="display:flex;align-items:center;gap:10px;flex:1">
+      <img src="icons/logo-vert.png" alt="Verdon Argens Randonnée" id="topbar-logo"
+           style="height:36px;width:auto;object-fit:contain;flex-shrink:0">
+      <div>
+        <div id="topbar-title">V.A.R.</div>
+        <div id="topbar-sub">Verdon Argens Randonnée</div>
+      </div>
     </div>
     <i class="ti ti-bell" id="topbar-bell" aria-hidden="true"></i>
   </div>
@@ -41,7 +45,14 @@
     <!-- ========== ACCUEIL ========== -->
     <div id="s-accueil" class="screen">
 
+      <!-- Bannières webmaster (configurables dans bannières.json) -->
+      <div id="banniere-wrap"></div>
+
+      <!-- Hero prochaine sortie avec logo club -->
       <div class="hero" id="hero-card" style="cursor:pointer">
+        <div class="hero-logo-wrap">
+          <img src="icons/logo-blanc.png" alt="V.A.R." class="hero-logo">
+        </div>
         <div class="hero-eyebrow" id="hero-eyebrow">Prochaine sortie</div>
         <div class="hero-title" id="hero-title">Chargement…</div>
         <div class="hero-sub"   id="hero-sub"></div>

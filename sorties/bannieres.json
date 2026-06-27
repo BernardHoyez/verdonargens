@@ -1,0 +1,32 @@
+[
+  {
+    "id": "b001",
+    "actif": true,
+    "type": "info",
+    "icone": "ti-info-circle",
+    "texte": "Bienvenue sur la nouvelle application du club V.A.R. ! Installez-la sur votre téléphone via le menu de votre navigateur.",
+    "date_fin": "2025-08-01",
+    "lien": null,
+    "lien_label": null
+  },
+  {
+    "id": "b002",
+    "actif": false,
+    "type": "alerte",
+    "icone": "ti-alert-triangle",
+    "texte": "La sortie du 6 juillet est annulée en raison des conditions météo. Nouvelle date à confirmer.",
+    "date_fin": "2025-07-07",
+    "lien": null,
+    "lien_label": null
+  },
+  {
+    "id": "b003",
+    "actif": false,
+    "type": "evenement",
+    "icone": "ti-calendar-event",
+    "texte": "Assemblée générale du club — samedi 20 septembre à 10h, salle des fêtes de Carcès.",
+    "date_fin": "2025-09-21",
+    "lien": null,
+    "lien_label": null
+  }
+]

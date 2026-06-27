@@ -71,6 +71,51 @@ async function loadSorties() {
   }
 }
 
+
+/* ===== BANNIÈRES WEBMASTER ===== */
+async function loadBannieres() {
+  const url = getJsonUrl().replace('sorties/2025.json', 'sorties/bannieres.json');
+  try {
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) return;
+    const bannieres = await r.json();
+    const today = new Date(); today.setHours(0,0,0,0);
+    const dismisses = JSON.parse(localStorage.getItem('var_banniere_dismissed') || '[]');
+
+    const actives = bannieres.filter(b =>
+      b.actif &&
+      !dismisses.includes(b.id) &&
+      (!b.date_fin || new Date(b.date_fin + 'T00:00:00') >= today)
+    );
+
+    const wrap = document.getElementById('banniere-wrap');
+    if (!wrap || !actives.length) return;
+
+    wrap.innerHTML = actives.map(b => `
+      <div class="banniere banniere-${b.type}" id="ban-${b.id}">
+        <i class="ti ${b.icone}" aria-hidden="true"></i>
+        <div class="banniere-content">
+          ${b.texte}
+          ${b.lien ? `<br><a class="banniere-lien" href="${b.lien}">${b.lien_label || 'En savoir plus'}</a>` : ''}
+        </div>
+        <button class="banniere-close" onclick="dismissBanniere('${b.id}')" aria-label="Fermer">×</button>
+      </div>
+    `).join('');
+  } catch(e) {
+    /* Bannières optionnelles — pas d'erreur si absent */
+  }
+}
+
+function dismissBanniere(id) {
+  const el = document.getElementById('ban-' + id);
+  if (el) el.style.display = 'none';
+  try {
+    const dismisses = JSON.parse(localStorage.getItem('var_banniere_dismissed') || '[]');
+    dismisses.push(id);
+    localStorage.setItem('var_banniere_dismissed', JSON.stringify(dismisses));
+  } catch(e) {}
+}
+
 /* ===== NAVIGATION ===== */
 function navTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -239,6 +284,7 @@ function closeFormulaire() {
 document.addEventListener('DOMContentLoaded', () => {
   navTo('accueil');
   loadSorties();
+  loadBannieres();
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js')
