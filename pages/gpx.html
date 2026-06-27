@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proposer un tracé — Rando Var</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <a href="../index.html" class="back-link"><i class="ti ti-arrow-left"></i></a>
+      <div>
+        <div id="topbar-title">Proposer un tracé GPX</div>
+        <div id="topbar-sub">Partager une randonnée</div>
+      </div>
+    </div>
+  </div>
+  <div id="screen" style="flex:1;overflow-y:auto">
+
+    <div class="page-hero" style="background:#FAEEDA;border-color:#EF9F27">
+      <i class="ti ti-route page-hero-icon" style="color:#633806"></i>
+      <h1 class="page-hero-title" style="color:#3D2000">Partagez votre tracé</h1>
+      <p class="page-hero-sub" style="color:#854F0B">Enrichissez la bibliothèque de randonnées du club</p>
+    </div>
+
+    <div class="page-section">
+      <h2>Comment ça marche ?</h2>
+      <div class="steps-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-title">Préparez votre fichier GPX</div>
+            <div class="step-desc">Exportez votre trace depuis votre GPS, Garmin, Komoot, Wikiloc, AllTrails ou tout autre application de randonnée.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-title">Envoyez le fichier par email</div>
+            <div class="step-desc">Joignez votre fichier .gpx à l'email en cliquant sur le bouton ci-dessous. Précisez le nom de la randonnée, la distance et le dénivelé.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-title">Validation et publication</div>
+            <div class="step-desc">Le webmaster vérifie le tracé et le publie sur la carte uMap et dans la bibliothèque. Vous serez informé par email.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-section">
+      <h2>Envoyer votre tracé</h2>
+      <a href="mailto:bhoyez@gmail.com?subject=Proposition tracé GPX&body=Bonjour,%0D%0A%0D%0AJe vous transmets un tracé GPX à ajouter à la bibliothèque du club.%0D%0A%0D%0ANom de la randonnée : %0D%0ADistance (km) : %0D%0ADénivelé (m) : %0D%0ANiveau : facile / moyen / difficile%0D%0APoints remarquables : %0D%0A%0D%0AJe joins le fichier .gpx en pièce jointe.%0D%0A%0D%0ACordialement"
+         class="btn-primary-full" style="background:#BA7517;border-color:#BA7517">
+        <i class="ti ti-mail"></i> Envoyer mon tracé GPX
+      </a>
+    </div>
+
+    <div class="page-section">
+      <h2>Formats acceptés</h2>
+      <div class="icon-list">
+        <div class="icon-item"><i class="ti ti-file"></i><span><strong>.gpx</strong> — format universel, recommandé</span></div>
+        <div class="icon-item"><i class="ti ti-file"></i><span><strong>.kml</strong> — format Google Earth</span></div>
+        <div class="icon-item"><i class="ti ti-apps"></i><span>Export depuis Garmin, Komoot, Wikiloc, AllTrails, IGNrando…</span></div>
+      </div>
+    </div>
+
+    <div class="page-section">
+      <h2>Conseils pour un bon tracé</h2>
+      <div class="icon-list">
+        <div class="icon-item"><i class="ti ti-check"></i><span>Vérifiez que le tracé est complet (aller + retour ou boucle)</span></div>
+        <div class="icon-item"><i class="ti ti-check"></i><span>Indiquez le point de départ et les points remarquables</span></div>
+        <div class="icon-item"><i class="ti ti-check"></i><span>Précisez si le tracé est adapté à tous les niveaux</span></div>
+        <div class="icon-item"><i class="ti ti-check"></i><span>Mentionnez les difficultés particulières (passages exposés, etc.)</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script src="../js/pages.js"></script>
+</body>
+</html>

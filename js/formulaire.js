@@ -135,24 +135,28 @@ function fSendEmail() {
   const d = fBuildData();
   const json = JSON.stringify(d, null, 2);
   const diffLabels = { facile: 'Facile', moyen: 'Moyen', difficile: 'Difficile' };
-  const sujet = encodeURIComponent('[Rando] ' + d.intitule + ' — ' + fFmtDate(d.date));
+  const sujet = encodeURIComponent('[Rando] ' + d.intitule + ' \u2014 ' + fFmtDate(d.date));
   const corps = encodeURIComponent(
-    'Bonjour,\n\nVoici la fiche de la randonnée à publier sur le site.\n\n'
+    'Bonjour,\n\nVoici la fiche de la randonn\u00e9e \u00e0 publier sur le site.\n\n'
     + '=== FICHE RANDO ===\n'
     + 'Date           : ' + fFmtDate(d.date) + '\n'
-    + 'Intitulé       : ' + d.intitule + '\n'
-    + 'Difficulté     : ' + (diffLabels[d.difficulte] || d.difficulte) + '\n'
+    + 'Intitul\u00e9       : ' + d.intitule + '\n'
+    + 'Difficult\u00e9     : ' + (diffLabels[d.difficulte] || d.difficulte) + '\n'
     + 'Distance       : ' + d.distance_km + ' km\n'
-    + 'Dénivelé       : ' + d.denivele_m + ' m\n'
-    + 'Départ Carcès  : ' + d.depart_carces + '\n'
-    + 'Départ rando   : ' + d.depart_rando + '\n'
-    + 'Point de départ: ' + d.point_depart + '\n'
-    + 'Trajet AR      : ' + (d.distance_ar_km || '—') + (d.distance_ar_km ? ' km' : '') + '\n'
+    + 'D\u00e9nivel\u00e9       : ' + d.denivele_m + ' m\n'
+    + 'D\u00e9part Carc\u00e8s  : ' + d.depart_carces + '\n'
+    + 'D\u00e9part rando   : ' + d.depart_rando + '\n'
+    + 'Point de d\u00e9part: ' + d.point_depart + '\n'
+    + 'Trajet AR      : ' + (d.distance_ar_km || '\u2014') + (d.distance_ar_km ? ' km' : '') + '\n'
     + 'Covoiturage    : ' + (d.covoiturage ? 'Oui' : 'Non') + '\n'
     + 'Animateur      : ' + d.animateur + '\n'
-    + 'Téléphone      : ' + (d.telephone || '—') + '\n'
-    + 'Points notables: ' + (d.points_remarquables.join(', ') || '—') + '\n\n'
-    + '=== JSON (à coller dans sorties/2025.json) ===\n'
+    + 'T\u00e9l\u00e9phone      : ' + (d.telephone || '\u2014') + '\n'
+    + 'Points notables: ' + (d.points_remarquables.join(', ') || '\u2014') + '\n\n'
+    + '=== JSON \u00e0 AJOUTER dans sorties/2025.json ===\n'
+    + 'Ouvrir le fichier sorties/2025.json sur GitHub.\n'
+    + 'Trouver le dernier bloc } avant le crochet fermant ].\n'
+    + 'Ajouter une virgule apr\u00e8s ce }, puis coller le bloc ci-dessous :\n\n'
+    + ',\n'
     + json + '\n\n'
     + 'Cordialement,\n' + d.animateur
   );
