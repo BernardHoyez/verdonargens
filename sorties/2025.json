@@ -101,4 +101,22 @@
     "telephone": "06 45 67 89 01",
     "trace_gpx": "traces/passees/2025-06-08-mont-coudon.gpx"
   }
+  ,
+{
+"id": "2026-09-27-grand-marges",
+"date": "2026-09-27",
+"intitule": "Grand Marges",
+"difficulte": "moyen",
+"distance_km": 15,
+"denivele_m": 860,
+"points_remarquables": [],
+"depart_carces": "08:00",
+"depart_rando": "09:00",
+"point_depart": "Parking du col d'illoire",
+"distance_ar_km": 95,
+"covoiturage": true,
+"animateur": "Alain",
+"telephone": "06 07 58 39 46",
+"trace_gpx": "traces/futures/2026-09-27-grand-marges.gpx"
+}
 ]
