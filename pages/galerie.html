@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galerie — V.A.R.</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/pages.css">
+  <link rel="stylesheet" href="../css/galerie.css">
+</head>
+<body>
+<div id="app">
+
+  <div id="topbar">
+    <div style="display:flex;align-items:center;gap:10px;flex:1">
+      <a href="../index.html" class="back-link"><i class="ti ti-arrow-left"></i></a>
+      <img src="../icons/logo-vert.png" alt="V.A.R." style="height:28px;width:auto;object-fit:contain;margin-left:4px">
+      <div>
+        <div id="topbar-title">Galerie</div>
+        <div id="topbar-sub">Photos & vidéos</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VUE 1 : Sélection de catégorie -->
+  <div id="vue-categories" style="flex:1;overflow-y:auto">
+    <div class="page-hero" style="background:linear-gradient(160deg,#0F6E56,#1D9E75);padding:20px 16px;text-align:center;border:none">
+      <i class="ti ti-photo" style="font-size:32px;color:rgba(255,255,255,.8);display:block;margin-bottom:6px"></i>
+      <div style="font-size:18px;font-weight:600;color:#fff;margin-bottom:4px">Galeries photos</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.75)">Souvenirs de nos randonnées</div>
+    </div>
+    <div id="cat-grid" class="cat-grid"></div>
+  </div>
+
+  <!-- VUE 2 : Liste des albums d'une catégorie -->
+  <div id="vue-albums" style="display:none;flex:1;overflow-y:auto">
+    <div class="section-bar">
+      <button class="section-back" onclick="showCategories()">
+        <i class="ti ti-arrow-left"></i> Galerie
+      </button>
+      <span id="albums-titre">Albums</span>
+    </div>
+    <div id="albums-list"></div>
+  </div>
+
+  <!-- VUE 3 : Album Google Photos en iframe -->
+  <div id="vue-album" style="display:none;flex:1;display:none;flex-direction:column">
+    <div class="section-bar">
+      <button class="section-back" id="album-back-btn">
+        <i class="ti ti-arrow-left"></i> <span id="album-back-label">Albums</span>
+      </button>
+      <span id="album-titre-bar" style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px"></span>
+    </div>
+    <div id="album-meta" class="album-meta-bar"></div>
+    <div style="flex:1;overflow:hidden">
+      <iframe id="album-iframe"
+        src=""
+        title="Album Google Photos"
+        allowfullscreen
+        loading="lazy"
+        style="width:100%;height:100%;border:none;display:block">
+      </iframe>
+    </div>
+    <div class="album-open-bar">
+      <a id="album-open-link" href="#" target="_blank" rel="noopener" class="btn-primary-full" style="margin:0">
+        <i class="ti ti-external-link"></i> Ouvrir dans Google Photos
+      </a>
+    </div>
+  </div>
+
+</div>
+<script>
+const BASE_JSON = '../sorties/galeries.json';
+let galeries = [];
+let catCourante = null;
+
+async function init() {
+  try {
+    const r = await fetch(BASE_JSON, { cache: 'no-store' });
+    galeries = await r.json();
+    renderCategories();
+  } catch(e) {
+    document.getElementById('cat-grid').innerHTML =
+      '<div style="padding:24px;text-align:center;color:#aaa;font-size:13px;">Impossible de charger les galeries.</div>';
+  }
+}
+
+function renderCategories() {
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = galeries.map(g => `
+    <div class="cat-card" onclick="showAlbums('${g.categorie}')" style="--cat-color:${g.couleur}">
+      <div class="cat-icon"><i class="ti ${g.icone}"></i></div>
+      <div class="cat-label">${g.label}</div>
+      <div class="cat-count">${g.albums.length} album${g.albums.length > 1 ? 's' : ''}</div>
+      <i class="ti ti-chevron-right cat-chevron"></i>
+    </div>
+  `).join('');
+}
+
+function showCategories() {
+  document.getElementById('vue-categories').style.display = '';
+  document.getElementById('vue-albums').style.display = 'none';
+  document.getElementById('vue-album').style.display = 'none';
+}
+
+function showAlbums(categorie) {
+  catCourante = galeries.find(g => g.categorie === categorie);
+  if (!catCourante) return;
+  document.getElementById('vue-categories').style.display = 'none';
+  document.getElementById('vue-albums').style.display = '';
+  document.getElementById('vue-album').style.display = 'none';
+  document.getElementById('albums-titre').textContent = catCourante.label;
+
+  const list = document.getElementById('albums-list');
+  list.innerHTML = catCourante.albums.map((a, i) => `
+    <div class="album-card" onclick="showAlbum(${i})">
+      <div class="album-card-icon" style="background:${catCourante.couleur}20;color:${catCourante.couleur}">
+        <i class="ti ${catCourante.icone}" style="font-size:24px"></i>
+      </div>
+      <div class="album-card-info">
+        <div class="album-card-titre">${a.titre}</div>
+        <div class="album-card-meta">${fmtDate(a.date)} · ${a.nb_photos} photos</div>
+      </div>
+      <i class="ti ti-chevron-right" style="color:#ccc;font-size:16px;flex-shrink:0"></i>
+    </div>
+  `).join('');
+}
+
+function showAlbum(idx) {
+  const a = catCourante.albums[idx];
+  document.getElementById('vue-albums').style.display = 'none';
+  document.getElementById('vue-album').style.display = 'flex';
+  document.getElementById('album-back-label').textContent = catCourante.label;
+  document.getElementById('album-back-btn').onclick = () => showAlbums(catCourante.categorie);
+  document.getElementById('album-titre-bar').textContent = a.titre;
+  document.getElementById('album-meta').innerHTML =
+    `<i class="ti ti-calendar" style="font-size:14px"></i> ${fmtDate(a.date)}&ensp;·&ensp;<i class="ti ti-photo" style="font-size:14px"></i> ${a.nb_photos} photos`;
+  document.getElementById('album-iframe').src = a.url_album;
+  document.getElementById('album-open-link').href = a.url_album;
+}
+
+function fmtDate(iso) {
+  if (!iso) return '';
+  const [y,m,d] = iso.split('-');
+  const mois = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
+  return parseInt(d) + ' ' + mois[parseInt(m)-1] + ' ' + y;
+}
+
+init();
+</script>
+</body>
+</html>

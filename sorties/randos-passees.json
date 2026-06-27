@@ -1,0 +1,99 @@
+[
+  {
+    "categorie": "dimanche",
+    "label": "Dimanche",
+    "icone": "ti-sun",
+    "couleur": "#1D9E75",
+    "randos": [
+      {
+        "id": "2025-06-08-mont-coudon",
+        "date": "2025-06-08",
+        "intitule": "Mont Coudon — panorama varois",
+        "difficulte": "moyen",
+        "distance_km": 11,
+        "denivele_m": 410,
+        "animateur": "Sophie Renard",
+        "participants": 14,
+        "umap_url": "https://umap.openstreetmap.fr/fr/map/assemblage-des-randonnees-var_705776#14/43.1950/6.0120",
+        "album_url": "https://photos.app.goo.gl/EXEMPLE_DIMANCHE_2",
+        "resume": "Belle ascension au départ du col de Coudon avec vue panoramique sur Toulon et la rade."
+      },
+      {
+        "id": "2025-05-25-sainte-victoire",
+        "date": "2025-05-25",
+        "intitule": "Sainte-Victoire — croix de Provence",
+        "difficulte": "difficile",
+        "distance_km": 16,
+        "denivele_m": 780,
+        "animateur": "Marie Leblanc",
+        "participants": 11,
+        "umap_url": "https://umap.openstreetmap.fr/fr/map/assemblage-des-randonnees-var_705776#13/43.5300/5.6200",
+        "album_url": "https://photos.app.goo.gl/EXEMPLE_SAINTE_VICTOIRE",
+        "resume": "Ascension mythique jusqu'à la croix culminant à 946 m, avec vue imprenable sur la plaine d'Aix."
+      }
+    ]
+  },
+  {
+    "categorie": "mercredi",
+    "label": "Mercredi",
+    "icone": "ti-calendar-week",
+    "couleur": "#0C447C",
+    "randos": [
+      {
+        "id": "2025-05-14-palayson",
+        "date": "2025-05-14",
+        "intitule": "Forêt de Palayson — étang et chênes-lièges",
+        "difficulte": "facile",
+        "distance_km": 7,
+        "denivele_m": 120,
+        "animateur": "Jean Dupont",
+        "participants": 18,
+        "umap_url": "https://umap.openstreetmap.fr/fr/map/assemblage-des-randonnees-var_705776#13/43.4200/6.5100",
+        "album_url": "https://photos.app.goo.gl/EXEMPLE_PALAYSON",
+        "resume": "Promenade tranquille en famille autour de l'étang de Palayson, sous les chênes-lièges centenaires."
+      }
+    ]
+  },
+  {
+    "categorie": "vendredi",
+    "label": "Vendredi",
+    "icone": "ti-calendar",
+    "couleur": "#633806",
+    "randos": [
+      {
+        "id": "2025-05-30-lavandes",
+        "date": "2025-05-30",
+        "intitule": "Collines du Var — sentier des lavandes",
+        "difficulte": "facile",
+        "distance_km": 9,
+        "denivele_m": 180,
+        "animateur": "Paul Martin",
+        "participants": 22,
+        "umap_url": "https://umap.openstreetmap.fr/fr/map/assemblage-des-randonnees-var_705776#13/43.6800/6.1200",
+        "album_url": "https://photos.app.goo.gl/EXEMPLE_LAVANDES",
+        "resume": "Sentier fleuri entre les champs de lavande et les villages perchés du haut Var."
+      }
+    ]
+  },
+  {
+    "categorie": "sejours",
+    "label": "Séjours",
+    "icone": "ti-tent",
+    "couleur": "#5A1F8C",
+    "randos": [
+      {
+        "id": "2025-06-14-mercantour",
+        "date": "2025-06-14",
+        "intitule": "Séjour Mercantour — 4 jours",
+        "difficulte": "difficile",
+        "distance_km": 52,
+        "denivele_m": 3200,
+        "animateur": "Marie Leblanc",
+        "participants": 16,
+        "umap_url": "https://umap.openstreetmap.fr/fr/map/assemblage-des-randonnees-var_705776#11/44.1200/7.0000",
+        "album_url": "https://photos.app.goo.gl/EXEMPLE_SEJOUR_1",
+        "resume": "4 jours de randonnée itinérante dans le parc du Mercantour, lacs d'altitude et faune sauvage."
+      }
+    ]
+  }
+]

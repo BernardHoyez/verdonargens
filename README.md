@@ -168,3 +168,45 @@ Aucune action nécessaire côté PWA : toute modification sur
 ---
 
 *PWA générée avec Claude (Anthropic) — Juin 2025*
+
+---
+
+## Ajouter un album Google Photos (Galerie)
+
+1. Dans Google Photos, ouvrir l'album à partager
+2. Cliquer **Partager → Créer un lien**
+3. Copier l'URL de partage (ex: `https://photos.app.goo.gl/XXXXXX`)
+4. Ouvrir `sorties/galeries.json` sur GitHub
+5. Dans la bonne catégorie (dimanche, mercredi…), ajouter un bloc :
+```json
+{
+  "id": "dim-2025-03",
+  "titre": "Nom de la rando",
+  "date": "2025-09-07",
+  "nb_photos": 28,
+  "url_album": "https://photos.app.goo.gl/XXXXXX",
+  "couverture_url": ""
+}
+```
+6. Commit → redéploiement automatique
+
+## Ajouter une randonnée passée
+
+Ouvrir `sorties/randos-passees.json`, ajouter dans la bonne catégorie :
+```json
+{
+  "id": "2025-09-07-mont-faron",
+  "date": "2025-09-07",
+  "intitule": "Mont Faron depuis Toulon",
+  "difficulte": "moyen",
+  "distance_km": 13,
+  "denivele_m": 450,
+  "animateur": "Marie Leblanc",
+  "participants": 17,
+  "umap_url": "https://umap.openstreetmap.fr/fr/map/assemblage-des-randonnees-var_705776#13/43.1500/5.9300",
+  "album_url": "https://photos.app.goo.gl/XXXXXX",
+  "resume": "Belle sortie avec vue sur la rade de Toulon..."
+}
+```
+Le champ `umap_url` est la carte globale avec le niveau de zoom et les coordonnées
+centrées sur la rando : `#ZOOM/LAT/LON` à ajuster sur umap.openstreetmap.fr.

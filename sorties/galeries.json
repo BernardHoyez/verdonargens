@@ -1,0 +1,106 @@
+[
+  {
+    "categorie": "dimanche",
+    "label": "Dimanche",
+    "icone": "ti-sun",
+    "couleur": "#1D9E75",
+    "albums": [
+      {
+        "id": "dim-2025-01",
+        "titre": "Gorges du Verdon — Sentier Martel",
+        "date": "2025-06-22",
+        "nb_photos": 34,
+        "url_album": "https://photos.app.goo.gl/EXEMPLE_DIMANCHE_1",
+        "couverture_url": ""
+      },
+      {
+        "id": "dim-2025-02",
+        "titre": "Mont Coudon — panorama varois",
+        "date": "2025-06-08",
+        "nb_photos": 21,
+        "url_album": "https://photos.app.goo.gl/EXEMPLE_DIMANCHE_2",
+        "couverture_url": ""
+      }
+    ]
+  },
+  {
+    "categorie": "mercredi",
+    "label": "Mercredi",
+    "icone": "ti-calendar-week",
+    "couleur": "#0C447C",
+    "albums": [
+      {
+        "id": "mer-2025-01",
+        "titre": "Balade forêt de Palayson",
+        "date": "2025-05-14",
+        "nb_photos": 15,
+        "url_album": "https://photos.app.goo.gl/EXEMPLE_MERCREDI_1",
+        "couverture_url": ""
+      }
+    ]
+  },
+  {
+    "categorie": "vendredi",
+    "label": "Vendredi",
+    "icone": "ti-calendar",
+    "couleur": "#633806",
+    "albums": [
+      {
+        "id": "ven-2025-01",
+        "titre": "Collines du Var — sentier des lavandes",
+        "date": "2025-05-30",
+        "nb_photos": 18,
+        "url_album": "https://photos.app.goo.gl/EXEMPLE_VENDREDI_1",
+        "couverture_url": ""
+      }
+    ]
+  },
+  {
+    "categorie": "sejours",
+    "label": "Séjours",
+    "icone": "ti-tent",
+    "couleur": "#5A1F8C",
+    "albums": [
+      {
+        "id": "sej-2025-01",
+        "titre": "Séjour Mercantour — juin 2025",
+        "date": "2025-06-14",
+        "nb_photos": 87,
+        "url_album": "https://photos.app.goo.gl/EXEMPLE_SEJOUR_1",
+        "couverture_url": ""
+      }
+    ]
+  },
+  {
+    "categorie": "videos",
+    "label": "Vidéos",
+    "icone": "ti-video",
+    "couleur": "#712B13",
+    "albums": [
+      {
+        "id": "vid-2025-01",
+        "titre": "Best-of randonnées 2025",
+        "date": "2025-06-01",
+        "nb_photos": 6,
+        "url_album": "https://photos.app.goo.gl/EXEMPLE_VIDEO_1",
+        "couverture_url": ""
+      }
+    ]
+  },
+  {
+    "categorie": "evenements",
+    "label": "Événements",
+    "icone": "ti-confetti",
+    "couleur": "#3A1060",
+    "albums": [
+      {
+        "id": "evt-2025-01",
+        "titre": "Assemblée générale 2025",
+        "date": "2025-03-15",
+        "nb_photos": 12,
+        "url_album": "https://photos.app.goo.gl/EXEMPLE_EVENEMENT_1",
+        "couverture_url": ""
+      }
+    ]
+  }
+]
