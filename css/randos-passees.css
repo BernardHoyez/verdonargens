@@ -1,0 +1,114 @@
+/* randos-passees.css — liste chronologique par année */
+
+.annee-header {
+  padding: 8px 16px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: #1D9E75;
+  letter-spacing: .04em;
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
+.rando-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-bottom: 1px solid #f0f0ec;
+  background: #fff;
+  transition: background .1s;
+}
+
+.rando-row-link {
+  cursor: pointer;
+}
+.rando-row-link:active { background: #f0faf6; }
+
+.rando-date {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1D9E75;
+  flex-shrink: 0;
+  min-width: 36px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rando-nom {
+  flex: 1;
+  font-size: 13px;
+  color: #1a1a18;
+  line-height: 1.4;
+}
+
+.rando-row-link .rando-nom {
+  color: #0a3d2e;
+}
+
+.rando-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+}
+
+.rando-icon-none {
+  opacity: .4;
+}
+
+/* Légende types de cartes */
+.legende {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 16px 6px;
+  font-size: 11px;
+  color: #888;
+  background: #f9f9f7;
+  border-bottom: 1px solid #eee;
+}
+.legende-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ===== SÉJOURS — affichage carte ===== */
+.sejour-card {
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: background .1s;
+}
+.sejour-card:active { background: #f9f9f7; }
+.sejour-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.sejour-annee-badge {
+  background: #5A1F8C;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.sejour-titre {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a18;
+  line-height: 1.4;
+  flex: 1;
+}
+.sejour-label {
+  font-size: 11px;
+  color: #888;
+  margin-top: 3px;
+}
