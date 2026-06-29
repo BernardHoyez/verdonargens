@@ -233,6 +233,12 @@ function setFiltre(btn, diff) {
 }
 
 /* ===== FICHE DÉTAIL ===== */
+function penibiliteHtml(p) {
+  const n = parseInt(p) || 0;
+  return '<span style="color:#BA7517;font-size:14px;letter-spacing:1px">'
+    + '★'.repeat(n) + '<span style="opacity:.25">' + '★'.repeat(3-n) + '</span></span>';
+}
+
 function showDetail(s) {
   document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
   document.getElementById('form-screen').classList.remove('active');
@@ -241,20 +247,36 @@ function showDetail(s) {
   document.getElementById('topbar-title').textContent = 'Fiche rando';
   document.getElementById('topbar-sub').textContent   = '';
 
-  document.getElementById('d-date').textContent       = capitalize(fmtDate(s.date));
-  document.getElementById('d-title').textContent      = s.intitule;
-  document.getElementById('d-badge').innerHTML        = badgeHtml(s.difficulte);
-  document.getElementById('d-dist').textContent       = s.distance_km + ' km';
-  document.getElementById('d-den').textContent        = s.denivele_m + ' m';
-  document.getElementById('d-ar').textContent         = s.distance_ar_km ? s.distance_ar_km + ' km' : '—';
-  document.getElementById('d-dep1').textContent       = s.depart_carces;
-  document.getElementById('d-dep2').textContent       = s.depart_rando;
-  document.getElementById('d-lieu').textContent       = s.point_depart;
+  document.getElementById('d-date').textContent        = capitalize(fmtDate(s.date));
+  document.getElementById('d-title').textContent       = s.intitule;
+  document.getElementById('d-badges').innerHTML        =
+    badgeHtml(s.difficulte) + ' ' + penibiliteHtml(s.penibilite) +
+    (s.ibp ? ` <span style="background:#f0f0ec;color:#555;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px">IBP ${s.ibp}</span>` : '');
+  document.getElementById('d-dist').textContent        = s.distance_km + ' km';
+  document.getElementById('d-den').textContent         = s.denivele_m + ' m';
+  document.getElementById('d-ar').textContent          = s.distance_ar_km ? s.distance_ar_km + ' km' : '—';
+  document.getElementById('d-dep1').textContent        = s.depart_carces;
+  document.getElementById('d-dep2').textContent        = s.depart_rando;
+  document.getElementById('d-lieu').textContent        = s.point_depart;
+  // Coordonnées GPS → lien Maps
+  const coordEl = document.getElementById('d-coords');
+  if (s.coords_depart) {
+    const [lat, lon] = s.coords_depart.split(',').map(v => v.trim());
+    coordEl.innerHTML = `<a href="https://maps.google.com/?q=${lat},${lon}" target="_blank" rel="noopener"
+      style="color:#1D9E75;text-decoration:none;font-size:12px">
+      <i class="ti ti-map-pin" style="font-size:13px;vertical-align:-2px"></i> ${s.coords_depart}
+    </a>`;
+  } else { coordEl.textContent = '—'; }
   const cov = document.getElementById('d-covoit');
-  cov.textContent = s.covoiturage ? 'Disponible' : 'Non prévu';
-  cov.style.color = s.covoiturage ? '#1D9E75' : '#888';
-  document.getElementById('d-pts').innerHTML =
-    (s.points_remarquables || []).map(p => `<span class="pt-pill">${p}</span>`).join('');
+  cov.textContent = s.covoiturage_euros ? s.covoiturage_euros + ' €' : 'Non prévu';
+  cov.style.color = s.covoiturage_euros ? '#1D9E75' : '#888';
+  document.getElementById('d-pts').textContent = s.points_remarquables || '—';
+  // Notes
+  const notesEl = document.getElementById('d-notes-block');
+  if (s.notes && s.notes.trim()) {
+    notesEl.style.display = '';
+    document.getElementById('d-notes').textContent = s.notes;
+  } else { notesEl.style.display = 'none'; }
   document.getElementById('d-av').textContent        = s.animateur.split(' ').map(w => w[0]).join('').toUpperCase();
   document.getElementById('d-anim-name').textContent = s.animateur;
   document.getElementById('d-anim-tel').textContent  = s.telephone || '';

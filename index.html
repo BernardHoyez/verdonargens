@@ -170,7 +170,7 @@
       <div class="detail-hero">
         <div class="detail-date"  id="d-date"></div>
         <div class="detail-title" id="d-title"></div>
-        <div style="margin-top:8px;" id="d-badge"></div>
+        <div style="margin-top:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap" id="d-badges"></div>
       </div>
 
       <div class="stats-row">
@@ -193,6 +193,10 @@
           <span class="dr-val" id="d-lieu"></span>
         </div>
         <div class="detail-row">
+          <span class="dr-label"><i class="ti ti-location" style="font-size:14px;" aria-hidden="true"></i> Coordonnées GPS</span>
+          <span class="dr-val" id="d-coords"></span>
+        </div>
+        <div class="detail-row">
           <span class="dr-label"><i class="ti ti-car" style="font-size:14px;" aria-hidden="true"></i> Covoiturage</span>
           <span class="dr-val" id="d-covoit"></span>
         </div>
@@ -200,7 +204,12 @@
 
       <div class="pts-block">
         <div class="pts-title">Points remarquables</div>
-        <div id="d-pts"></div>
+        <div id="d-pts" style="font-size:13px;color:#555;line-height:1.5"></div>
+      </div>
+
+      <div class="pts-block" id="d-notes-block">
+        <div class="pts-title">Notes</div>
+        <div id="d-notes" style="font-size:13px;color:#666;line-height:1.5;font-style:italic"></div>
       </div>
 
       <div class="anim-row">
@@ -237,18 +246,21 @@
         <span class="step-label" id="fstep-label"><strong>Étape 1/3</strong> — La randonnée</span>
       </div>
 
-      <!-- Étape 0 : La rando -->
+      <!-- ── Étape 0 : La randonnée ── -->
       <div id="fstep0" class="form-body">
+
         <div class="field">
           <label>Date de la sortie *</label>
           <input type="date" id="ff-date">
           <div class="err" id="ferr-date">Date requise</div>
         </div>
+
         <div class="field">
-          <label>Intitulé *</label>
-          <input type="text" id="ff-titre" placeholder="Ex : Tour du lac de Carcès">
+          <label>Intitulé * <span id="ff-titre-count" style="float:right;font-size:11px;color:#aaa">50</span></label>
+          <input type="text" id="ff-titre" placeholder="Ex : Tour du lac de Carcès" maxlength="50">
           <div class="err" id="ferr-titre">Intitulé requis</div>
         </div>
+
         <div class="field">
           <label>Difficulté *</label>
           <div class="diff-row">
@@ -258,6 +270,18 @@
           </div>
           <div class="err" id="ferr-diff">Choisir une difficulté</div>
         </div>
+
+        <div class="field">
+          <label>Pénibilité *</label>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:4px">
+            <button id="fpen-1" onclick="setFPenib(1)" style="background:none;border:none;cursor:pointer;font-size:28px;color:#ddd;opacity:.5;padding:0 4px" aria-label="Pénibilité 1">★</button>
+            <button id="fpen-2" onclick="setFPenib(2)" style="background:none;border:none;cursor:pointer;font-size:28px;color:#ddd;opacity:.5;padding:0 4px" aria-label="Pénibilité 2">★</button>
+            <button id="fpen-3" onclick="setFPenib(3)" style="background:none;border:none;cursor:pointer;font-size:28px;color:#ddd;opacity:.5;padding:0 4px" aria-label="Pénibilité 3">★</button>
+            <span style="font-size:12px;color:#888;margin-left:6px">* faible &nbsp; ** modérée &nbsp; *** élevée</span>
+          </div>
+          <div class="err" id="ferr-penib">Choisir une pénibilité</div>
+        </div>
+
         <div class="field-row">
           <div class="field" style="margin:0">
             <label>Distance (km) *</label>
@@ -265,22 +289,27 @@
             <div class="err" id="ferr-dist">Requis</div>
           </div>
           <div class="field" style="margin:0">
-            <label>Dénivelé (m)</label>
+            <label>Dénivelé (m) *</label>
             <input type="number" id="ff-den" placeholder="380" min="0" max="3000">
+            <div class="err" id="ferr-den">Requis</div>
           </div>
         </div>
+
         <div class="field" style="margin-top:14px">
-          <label>Points remarquables</label>
-          <div class="pts-wrap" id="fpts-list"></div>
-          <div class="pt-add">
-            <input type="text" id="fpt-input" placeholder="Ajouter un point…">
-            <button onclick="fAddPt()"><i class="ti ti-plus" style="font-size:14px;" aria-hidden="true"></i></button>
-          </div>
+          <label>Indice IBP <span style="font-size:11px;color:#aaa;font-weight:400">(optionnel)</span></label>
+          <input type="number" id="ff-ibp" placeholder="Ex : 98" min="0" max="500">
         </div>
+
+        <div class="field">
+          <label>Points remarquables <span id="ff-pts-count" style="float:right;font-size:11px;color:#aaa">100</span></label>
+          <input type="text" id="ff-pts" placeholder="Belvédère, chapelle, source…" maxlength="100">
+        </div>
+
       </div>
 
-      <!-- Étape 1 : Logistique & animateur -->
+      <!-- ── Étape 1 : Logistique & animateur ── -->
       <div id="fstep1" class="form-body" style="display:none">
+
         <div class="field-row">
           <div class="field" style="margin:0">
             <label>Départ Carcès *</label>
@@ -291,36 +320,48 @@
             <input type="time" id="ff-dep2" value="09:00">
           </div>
         </div>
+
         <div class="field" style="margin-top:14px">
-          <label>Point de départ *</label>
-          <input type="text" id="ff-lieu" placeholder="Ex : Parking lac de Carcès">
+          <label>Point de départ * <span id="ff-lieu-count" style="float:right;font-size:11px;color:#aaa">50</span></label>
+          <input type="text" id="ff-lieu" placeholder="Ex : Parking lac de Carcès" maxlength="50">
           <div class="err" id="ferr-lieu">Lieu requis</div>
         </div>
+
+        <div class="field">
+          <label>Coordonnées GPS <span style="font-size:11px;color:#aaa;font-weight:400">(lat, lon)</span></label>
+          <input type="text" id="ff-coords" placeholder="43.4812, 6.1753">
+        </div>
+
         <div class="field-row">
           <div class="field" style="margin:0">
-            <label>Distance AR (km)</label>
+            <label>Distance A/R (km)</label>
             <input type="number" id="ff-ar" placeholder="34" min="0" max="500">
           </div>
           <div class="field" style="margin:0">
-            <label>Covoiturage</label>
-            <div class="covoit-row">
-              <button class="covoit-btn" id="fcv-oui" onclick="setFCovoit(true)">Dispo</button>
-              <button class="covoit-btn" id="fcv-non" onclick="setFCovoit(false)">Non prévu</button>
-            </div>
+            <label>Covoiturage (€)</label>
+            <input type="number" id="ff-covoit" placeholder="4" min="0" max="50">
           </div>
         </div>
+
         <div class="field" style="margin-top:14px">
-          <label>Votre nom (animateur) *</label>
-          <input type="text" id="ff-anim" placeholder="Prénom Nom">
+          <label>Votre nom (animateur) * <span id="ff-anim-count" style="float:right;font-size:11px;color:#aaa">20</span></label>
+          <input type="text" id="ff-anim" placeholder="Prénom Nom" maxlength="20">
           <div class="err" id="ferr-anim">Nom requis</div>
         </div>
+
         <div class="field">
-          <label>Votre téléphone</label>
+          <label>Téléphone</label>
           <input type="tel" id="ff-tel" placeholder="06 XX XX XX XX">
         </div>
+
+        <div class="field">
+          <label>Notes <span id="ff-notes-count" style="float:right;font-size:11px;color:#aaa">100</span></label>
+          <input type="text" id="ff-notes" placeholder="Chaussures imperméables, lampe frontale…" maxlength="100">
+        </div>
+
       </div>
 
-      <!-- Étape 2 : Récapitulatif -->
+      <!-- ── Étape 2 : Récapitulatif ── -->
       <div id="fstep2" class="form-body" style="display:none">
         <div id="f-recap"></div>
         <div class="send-note">
@@ -329,7 +370,7 @@
         </div>
       </div>
 
-      <!-- Étape 3 : Confirmation -->
+      <!-- ── Étape 3 : Confirmation ── -->
       <div id="fstep3" class="form-body" style="display:none">
         <div class="success-screen">
           <i class="ti ti-circle-check" aria-hidden="true"></i>
