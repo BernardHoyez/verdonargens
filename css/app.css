@@ -450,23 +450,10 @@ a.filtre-btn { display: inline-flex; align-items: center; }
 #topbar { min-height: 58px; }
 #topbar-logo { filter: drop-shadow(0 1px 2px rgba(0,0,0,.08)); }
 
-/* ===== HERO AVEC LOGO ===== */
-.hero { padding: 0 0 14px; }
-.hero-logo-wrap {
-  background: linear-gradient(160deg, #0F6E56 0%, #1D9E75 60%, #25C090 100%);
-  padding: 16px 20px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid rgba(255,255,255,.15);
-  margin-bottom: 12px;
-}
-.hero-logo {
-  height: 56px;
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,.18));
-}
+/* ===== HERO SANS LOGO (bandeau photo séparé) ===== */
+.hero { padding: 12px 0 14px; }
+
+
 .hero .hero-eyebrow { padding: 0 16px; }
 .hero .hero-title   { padding: 0 16px; }
 .hero .hero-sub     { padding: 0 16px; }

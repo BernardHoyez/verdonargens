@@ -147,6 +147,39 @@ function dismissBanniere(id) {
   } catch(e) {}
 }
 
+/* ===== BANDEAU PHOTO ===== */
+const BANDEAU_PHOTOS = [
+  'bandeau/bandeau-calanques1.jpg',
+  'bandeau/bandeau-calanques2.jpg',
+  'bandeau/bandeau-verdon.jpg'
+];
+
+async function initBandeau() {
+  const img = document.getElementById('bandeau-img');
+  if (!img) return;
+
+  /* Vérifier si evenement.jpg existe dans /bandeau */
+  const eventUrl = baseUrl() + 'bandeau/evenement.jpg';
+  try {
+    const r = await fetch(eventUrl, { method: 'HEAD', cache: 'no-store' });
+    if (r.ok) {
+      img.src = eventUrl;
+      console.log('[Bandeau] Image événement chargée');
+      return;
+    }
+  } catch(e) { /* pas d'image événement */ }
+
+  /* Sinon : choisir aléatoirement parmi les photos */
+  const idx = Math.floor(Math.random() * BANDEAU_PHOTOS.length);
+  img.src = baseUrl() + BANDEAU_PHOTOS[idx];
+  console.log('[Bandeau] Photo aléatoire :', BANDEAU_PHOTOS[idx]);
+}
+
+function heroBandeauClick() {
+  /* Clic sur le bandeau → aller à l'agenda */
+  navTo('agenda');
+}
+
 /* ===== NAVIGATION ===== */
 function navTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -375,6 +408,7 @@ function closeFormulaire() {
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', () => {
   navTo('accueil');
+  initBandeau();
   loadSorties();
   loadBannieres();
 
