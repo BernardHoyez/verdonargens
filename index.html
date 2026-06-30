@@ -73,11 +73,38 @@
     <!-- ========== AGENDA ========== -->
     <div id="s-agenda" class="screen">
 
-      <div class="filtre-bar">
-        <button class="filtre-btn on"  onclick="setFiltre(this,'tous')">Toutes</button>
-        <button class="filtre-btn"     onclick="setFiltre(this,'facile')">Facile</button>
-        <button class="filtre-btn"     onclick="setFiltre(this,'moyen')">Moyen</button>
-        <button class="filtre-btn"     onclick="setFiltre(this,'difficile')">Difficile</button>
+      <!-- Filtre par jour -->
+      <div class="filtre-bar" style="border-bottom:none;padding-bottom:6px">
+        <button class="filtre-btn filtre-jour on"
+                onclick="setFiltreJour(this,'tous')"
+                style="--fc:#555">Tous les jours</button>
+        <button class="filtre-btn filtre-jour"
+                onclick="setFiltreJour(this,'dimanche')"
+                style="--fc:#1D9E75">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1D9E75;margin-right:4px;vertical-align:1px"></span>Dimanche
+        </button>
+        <button class="filtre-btn filtre-jour"
+                onclick="setFiltreJour(this,'mercredi')"
+                style="--fc:#0C447C">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#0C447C;margin-right:4px;vertical-align:1px"></span>Mercredi
+        </button>
+        <button class="filtre-btn filtre-jour"
+                onclick="setFiltreJour(this,'vendredi')"
+                style="--fc:#BA7517">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#BA7517;margin-right:4px;vertical-align:1px"></span>Vendredi
+        </button>
+        <a class="filtre-btn" href="pages/sejours.html"
+           style="text-decoration:none;--fc:#6B2FAD">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#6B2FAD;margin-right:4px;vertical-align:1px"></span>Séjours
+        </a>
+      </div>
+      <!-- Filtre par difficulté -->
+      <div class="filtre-bar" style="padding-top:0;border-bottom:1px solid #eee;background:#f9f9f7">
+        <span style="font-size:11px;color:#aaa;flex-shrink:0;padding-right:4px">Niveau :</span>
+        <button class="filtre-btn filtre-diff on" onclick="setFiltreDiff(this,'tous')">Tous</button>
+        <button class="filtre-btn filtre-diff"    onclick="setFiltreDiff(this,'facile')">Facile</button>
+        <button class="filtre-btn filtre-diff"    onclick="setFiltreDiff(this,'moyen')">Moyen</button>
+        <button class="filtre-btn filtre-diff"    onclick="setFiltreDiff(this,'difficile')">Difficile</button>
       </div>
 
       <div id="agenda-list"></div>
@@ -126,6 +153,7 @@
       <div class="info-section">
         <h3>Nos sorties</h3>
         <a class="info-link" href="pages/randos-passees.html"><i class="ti ti-history" aria-hidden="true"></i><span>Randonnées passées</span><i class="ti ti-chevron-right" style="margin-left:auto;color:#ccc;font-size:14px" aria-hidden="true"></i></a>
+        <a class="info-link" href="pages/sejours.html"><i class="ti ti-tent" aria-hidden="true"></i><span>Séjours à venir</span><i class="ti ti-chevron-right" style="margin-left:auto;color:#ccc;font-size:14px" aria-hidden="true"></i></a>
         <a class="info-link" href="pages/galerie.html"><i class="ti ti-photo" aria-hidden="true"></i><span>Galerie photos &amp; vidéos</span><i class="ti ti-chevron-right" style="margin-left:auto;color:#ccc;font-size:14px" aria-hidden="true"></i></a>
       </div>
 

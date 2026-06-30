@@ -2,9 +2,25 @@
    Fetch robuste : construit l'URL depuis location.href
    pour fonctionner sur GitHub Pages ET en local. */
 
-let allSorties = [];
-let currentFilter = 'tous';
+/* Données par jour */
+let sorties = {
+  dimanche: [],
+  mercredi: [],
+  vendredi: [],
+  sejours:  []
+};
+let jourActif  = 'tous';   /* filtre jour */
+let diffActif  = 'tous';   /* filtre difficulté */
 window._sortieIndex = [];
+
+/* Toutes les sorties fusionnées avec tag jour */
+function allSorties() {
+  const res = [];
+  ['dimanche','mercredi','vendredi'].forEach(j => {
+    sorties[j].forEach(s => res.push({ ...s, _jour: j }));
+  });
+  return res;
+}
 
 /* ===== CONSTRUCTION URL JSON ===== */
 function getJsonUrl() {
@@ -51,24 +67,39 @@ function isFuture(iso) {
 function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
 /* ===== CHARGEMENT ===== */
-async function loadSorties() {
-  const url = getJsonUrl();
-  console.log('[Rando Var] Fetch :', url);
-
+function baseUrl() {
+  let base = location.href.split('?')[0].split('#')[0];
+  base = base.substring(0, base.lastIndexOf('/') + 1);
+  return base;
+}
+async function fetchJson(filename) {
+  const url = baseUrl() + 'sorties/' + filename;
   try {
     const r = await fetch(url, { cache: 'no-store' });
-    if (!r.ok) throw new Error('HTTP ' + r.status + ' pour ' + url);
-    allSorties = await r.json();
-    console.log('[Rando Var]', allSorties.length, 'sorties chargées.');
-    renderAccueil();
-    renderAgenda();
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
   } catch(e) {
-    console.error('[Rando Var] Erreur :', e.message);
-    document.getElementById('hero-eyebrow').textContent = '⚠ Erreur de chargement';
-    document.getElementById('hero-title').textContent   = e.message;
-    document.getElementById('hero-sub').textContent     = 'URL tentée : ' + url;
-    document.getElementById('hero-chips').innerHTML     = '';
+    console.warn('[Rando Var] Impossible de charger', filename, ':', e.message);
+    return [];
   }
+}
+
+async function loadSorties() {
+  /* Chargement parallèle des 3 fichiers jour */
+  const [dim, mer, ven] = await Promise.all([
+    fetchJson('2025.json'),
+    fetchJson('mercredi-2026-T4.json'),
+    fetchJson('vendredi-2026-T4.json')
+  ]);
+  sorties.dimanche = dim;
+  sorties.mercredi = mer;
+  sorties.vendredi = ven;
+
+  const total = dim.length + mer.length + ven.length;
+  console.log('[Rando Var]', total, 'sorties chargées (dim:', dim.length, 'mer:', mer.length, 'ven:', ven.length, ')');
+
+  renderAccueil();
+  renderAgenda();
 }
 
 
@@ -147,6 +178,13 @@ function navTo(id) {
 function cardHtml(s) {
   const idx = window._sortieIndex.length;
   window._sortieIndex.push(s);
+  const jour = s._jour || '';
+  const jourBadge = jour
+    ? `<span style="background:${jourColor(jour)}18;color:${jourColor(jour)};font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;margin-right:4px">${jourLabel(jour)}</span>`
+    : '';
+  const meta = s.distance_km
+    ? `${jourBadge}${s.distance_km} km · ${s.denivele_m} m · ${badgeHtml(s.difficulte)}`
+    : `${jourBadge}${badgeHtml(s.difficulte)}`;
   return `<div class="rando-card" onclick="showDetailByIndex(${idx})">
     <div class="date-col">
       <div class="date-day">${fmtDay(s.date)}</div>
@@ -154,18 +192,27 @@ function cardHtml(s) {
     </div>
     <div class="rando-info">
       <div class="rando-name">${s.intitule}</div>
-      <div class="rando-meta">${s.distance_km} km · ${s.denivele_m} m · ${badgeHtml(s.difficulte)}</div>
+      <div class="rando-meta">${meta}</div>
     </div>
     <i class="ti ti-chevron-right chevron" aria-hidden="true"></i>
   </div>`;
 }
 function showDetailByIndex(idx) { showDetail(window._sortieIndex[idx]); }
 
+/* Etiquette jour */
+function jourLabel(j) {
+  return { dimanche:'Dim.', mercredi:'Mer.', vendredi:'Ven.' }[j] || '';
+}
+function jourColor(j) {
+  return { dimanche:'#1D9E75', mercredi:'#0C447C', vendredi:'#BA7517' }[j] || '#888';
+}
+
 /* ===== ACCUEIL ===== */
 function renderAccueil() {
   window._sortieIndex = [];
-  const futures = allSorties.filter(s => isFuture(s.date)).sort((a,b) => a.date.localeCompare(b.date));
-  const passees = allSorties.filter(s => !isFuture(s.date)).sort((a,b) => b.date.localeCompare(a.date));
+  const all = allSorties();
+  const futures = all.filter(s => isFuture(s.date)).sort((a,b) => a.date.localeCompare(b.date));
+  const passees = all.filter(s => !isFuture(s.date)).sort((a,b) => b.date.localeCompare(a.date));
   const p = futures[0];
 
   if (p) {
@@ -201,13 +248,21 @@ function renderAccueil() {
 /* ===== AGENDA ===== */
 function renderAgenda() {
   window._sortieIndex = [];
-  const filtered = allSorties
-    .filter(s => isFuture(s.date))
-    .filter(s => currentFilter === 'tous' || s.difficulte === currentFilter)
-    .sort((a,b) => a.date.localeCompare(b.date));
 
+  /* Filtres combinés : jour + difficulté */
+  let all = allSorties().filter(s => isFuture(s.date));
+
+  if (jourActif !== 'tous') {
+    all = all.filter(s => s._jour === jourActif);
+  }
+  if (diffActif !== 'tous') {
+    all = all.filter(s => s.difficulte === diffActif);
+  }
+  all.sort((a, b) => a.date.localeCompare(b.date));
+
+  /* Regroupement par mois */
   const byMonth = {};
-  filtered.forEach(s => {
+  all.forEach(s => {
     const k = s.date.slice(0, 7);
     if (!byMonth[k]) byMonth[k] = [];
     byMonth[k].push(s);
@@ -216,18 +271,33 @@ function renderAgenda() {
   const moisNoms = ['','Janvier','Février','Mars','Avril','Mai','Juin',
                     'Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
   let html = '';
-  Object.entries(byMonth).forEach(([k, sorties]) => {
+  Object.entries(byMonth).forEach(([k, liste]) => {
     const [y, m] = k.split('-');
     html += `<div class="section-title">${moisNoms[parseInt(m)]} ${y}</div>`;
-    html += sorties.map(s => cardHtml(s)).join('');
+    html += liste.map(s => cardHtml(s)).join('');
   });
+
   document.getElementById('agenda-list').innerHTML = html ||
-    '<div style="padding:24px;text-align:center;color:#aaa;font-size:13px;">Aucune sortie pour ce niveau.</div>';
+    '<div style="padding:24px;text-align:center;color:#aaa;font-size:13px;">Aucune sortie pour ces critères.</div>';
+
+  /* Mise à jour du sous-titre topbar */
+  const total = all.length;
+  const sub = document.getElementById('topbar-sub');
+  if (sub && document.getElementById('nb-agenda').classList.contains('active')) {
+    sub.textContent = total + ' sortie' + (total > 1 ? 's' : '') + ' à venir';
+  }
 }
 
-function setFiltre(btn, diff) {
-  currentFilter = diff;
-  document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('on'));
+function setFiltreJour(btn, jour) {
+  jourActif = jour;
+  document.querySelectorAll('.filtre-jour').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderAgenda();
+}
+
+function setFiltreDiff(btn, diff) {
+  diffActif = diff;
+  document.querySelectorAll('.filtre-diff').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   renderAgenda();
 }
@@ -252,8 +322,8 @@ function showDetail(s) {
   document.getElementById('d-badges').innerHTML        =
     badgeHtml(s.difficulte) + ' ' + penibiliteHtml(s.penibilite) +
     (s.ibp ? ` <span style="background:#f0f0ec;color:#555;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px">IBP ${s.ibp}</span>` : '');
-  document.getElementById('d-dist').textContent        = s.distance_km + ' km';
-  document.getElementById('d-den').textContent         = s.denivele_m + ' m';
+  document.getElementById('d-dist').textContent        = s.distance_km ? s.distance_km + ' km' : '—';
+  document.getElementById('d-den').textContent          = s.denivele_m ? s.denivele_m + ' m' : '—';
   document.getElementById('d-ar').textContent          = s.distance_ar_km ? s.distance_ar_km + ' km' : '—';
   document.getElementById('d-dep1').textContent        = s.depart_carces;
   document.getElementById('d-dep2').textContent        = s.depart_rando;

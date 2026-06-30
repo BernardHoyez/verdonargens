@@ -173,6 +173,9 @@ body {
   transition: all .15s;
 }
 .filtre-btn.on { background: #1D9E75; color: #fff; border-color: #1D9E75; }
+.filtre-jour.on { background: var(--fc, #1D9E75); color: #fff; border-color: var(--fc, #1D9E75); }
+.filtre-jour.on span { background: #fff !important; }
+a.filtre-btn { display: inline-flex; align-items: center; }
 
 /* ===== FICHE DÉTAIL ===== */
 #detail-screen { display: none; }
