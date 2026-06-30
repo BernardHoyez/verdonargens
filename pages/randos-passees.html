@@ -10,10 +10,10 @@
   <link rel="stylesheet" href="../css/galerie.css">
   <link rel="stylesheet" href="../css/randos-passees.css">
 </head>
-<body>
-<div id="app">
+<body style="height:100dvh;overflow:hidden">
+<div id="app" style="height:100dvh;display:flex;flex-direction:column;overflow:hidden">
 
-  <div id="topbar">
+  <div id="topbar" style="flex-shrink:0">
     <div style="display:flex;align-items:center;gap:10px;flex:1">
       <button class="back-link" id="btn-back" onclick="goBack()" style="background:none;border:none;padding:0;cursor:pointer">
         <i class="ti ti-arrow-left" style="font-size:20px;color:#1D9E75"></i>
@@ -27,7 +27,7 @@
   </div>
 
   <!-- VUE 1 : Grille des catégories -->
-  <div id="vue-categories" style="overflow-y:auto;flex:1">
+  <div id="vue-categories" style="overflow-y:auto;flex:1;min-height:0">
     <div style="background:linear-gradient(160deg,#085041,#1D9E75);padding:20px 16px;text-align:center">
       <i class="ti ti-history" style="font-size:32px;color:rgba(255,255,255,.8);display:block;margin-bottom:6px"></i>
       <div style="font-size:18px;font-weight:600;color:#fff;margin-bottom:4px">Randonnées passées</div>
@@ -41,7 +41,7 @@
   </div>
 
   <!-- VUE 2 : Liste chronologique d'une catégorie -->
-  <div id="vue-liste" style="display:none;overflow-y:auto;flex:1">
+  <div id="vue-liste" style="display:none;overflow-y:auto;flex:1;min-height:0">
     <div id="liste-content"></div>
     <div style="margin:12px 16px 24px;padding:10px 12px;background:#FFF8E6;border-radius:8px;border:1px solid #EFD48A;font-size:12px;color:#6B4A00;line-height:1.5">
       <i class="ti ti-alert-triangle" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>
@@ -50,11 +50,11 @@
   </div>
 
   <!-- VUE 3 : Carte uMap d'une rando -->
-  <div id="vue-carte" style="display:none;flex:1;flex-direction:column">
+  <div id="vue-carte" style="display:none;flex-direction:column;min-height:0">
     <div id="carte-info" class="rando-past-hero" style="flex-shrink:0"></div>
-    <div style="flex:1;min-height:0;position:relative">
+    <div style="flex:1;min-height:0;position:relative;overflow:hidden">
       <iframe id="carte-iframe" src="" title="Tracé" allowfullscreen loading="lazy"
-        style="width:100%;height:100%;border:none;display:block"></iframe>
+        style="position:absolute;inset:0;width:100%;height:100%;border:none;display:block"></iframe>
     </div>
     <div style="padding:10px 16px;background:#fff;border-top:1px solid #eee;display:flex;gap:8px;flex-shrink:0">
       <a id="carte-open-link" href="#" target="_blank" rel="noopener"
@@ -85,9 +85,16 @@ async function init() {
 
 function setVue(v) {
   vue = v;
-  document.getElementById('vue-categories').style.display = v==='categories' ? '' : 'none';
-  document.getElementById('vue-liste').style.display     = v==='liste'       ? '' : 'none';
-  document.getElementById('vue-carte').style.display     = v==='carte'       ? 'flex' : 'none';
+  const cat   = document.getElementById('vue-categories');
+  const liste = document.getElementById('vue-liste');
+  const carte = document.getElementById('vue-carte');
+  /* Toutes les vues occupent flex:1 sauf quand cachées */
+  cat.style.display   = v==='categories' ? 'block' : 'none';
+  cat.style.flex      = v==='categories' ? '1'     : '';
+  liste.style.display = v==='liste'      ? 'block' : 'none';
+  liste.style.flex    = v==='liste'      ? '1'     : '';
+  carte.style.display = v==='carte'      ? 'flex'  : 'none';
+  carte.style.flex    = v==='carte'      ? '1'     : '';
 }
 
 function goBack() {

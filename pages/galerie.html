@@ -9,10 +9,10 @@
   <link rel="stylesheet" href="../css/pages.css">
   <link rel="stylesheet" href="../css/galerie.css">
 </head>
-<body>
-<div id="app">
+<body style="height:100dvh;overflow:hidden">
+<div id="app" style="height:100dvh;display:flex;flex-direction:column;overflow:hidden">
 
-  <div id="topbar">
+  <div id="topbar" style="flex-shrink:0">
     <div style="display:flex;align-items:center;gap:10px;flex:1">
       <a href="../index.html" class="back-link"><i class="ti ti-arrow-left"></i></a>
       <img src="../icons/logo-vert.png" alt="V.A.R." style="height:28px;width:auto;object-fit:contain;margin-left:4px">
@@ -24,7 +24,7 @@
   </div>
 
   <!-- VUE 1 : Sélection de catégorie -->
-  <div id="vue-categories" style="flex:1;overflow-y:auto">
+  <div id="vue-categories" style="flex:1;overflow-y:auto;min-height:0">
     <div class="page-hero" style="background:linear-gradient(160deg,#0F6E56,#1D9E75);padding:20px 16px;text-align:center;border:none">
       <i class="ti ti-photo" style="font-size:32px;color:rgba(255,255,255,.8);display:block;margin-bottom:6px"></i>
       <div style="font-size:18px;font-weight:600;color:#fff;margin-bottom:4px">Galeries photos</div>
@@ -34,7 +34,7 @@
   </div>
 
   <!-- VUE 2 : Liste des albums d'une catégorie -->
-  <div id="vue-albums" style="display:none;flex:1;overflow-y:auto">
+  <div id="vue-albums" style="display:none;flex:1;overflow-y:auto;min-height:0">
     <div class="section-bar">
       <button class="section-back" onclick="showCategories()">
         <i class="ti ti-arrow-left"></i> Galerie
@@ -45,24 +45,24 @@
   </div>
 
   <!-- VUE 3 : Album Google Photos en iframe -->
-  <div id="vue-album" style="display:none;flex:1;display:none;flex-direction:column">
-    <div class="section-bar">
+  <div id="vue-album" style="display:none;flex-direction:column;min-height:0">
+    <div class="section-bar" style="flex-shrink:0">
       <button class="section-back" id="album-back-btn">
         <i class="ti ti-arrow-left"></i> <span id="album-back-label">Albums</span>
       </button>
       <span id="album-titre-bar" style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px"></span>
     </div>
-    <div id="album-meta" class="album-meta-bar"></div>
-    <div style="flex:1;overflow:hidden">
+    <div id="album-meta" class="album-meta-bar" style="flex-shrink:0"></div>
+    <div style="flex:1;min-height:0;position:relative;overflow:hidden">
       <iframe id="album-iframe"
         src=""
         title="Album Google Photos"
         allowfullscreen
         loading="lazy"
-        style="width:100%;height:100%;border:none;display:block">
+        style="position:absolute;inset:0;width:100%;height:100%;border:none;display:block">
       </iframe>
     </div>
-    <div class="album-open-bar">
+    <div class="album-open-bar" style="flex-shrink:0">
       <a id="album-open-link" href="#" target="_blank" rel="noopener" class="btn-primary-full" style="margin:0">
         <i class="ti ti-external-link"></i> Ouvrir dans Google Photos
       </a>
@@ -101,7 +101,7 @@ function renderCategories() {
 function showCategories() {
   document.getElementById('vue-categories').style.display = '';
   document.getElementById('vue-albums').style.display = 'none';
-  document.getElementById('vue-album').style.display = 'none';
+  const _ah = document.getElementById('vue-album'); _ah.style.display = 'none'; _ah.style.flex = '';
 }
 
 function showAlbums(categorie) {
@@ -109,7 +109,7 @@ function showAlbums(categorie) {
   if (!catCourante) return;
   document.getElementById('vue-categories').style.display = 'none';
   document.getElementById('vue-albums').style.display = '';
-  document.getElementById('vue-album').style.display = 'none';
+  const _ah = document.getElementById('vue-album'); _ah.style.display = 'none'; _ah.style.flex = '';
   document.getElementById('albums-titre').textContent = catCourante.label;
 
   const list = document.getElementById('albums-list');
@@ -130,7 +130,7 @@ function showAlbums(categorie) {
 function showAlbum(idx) {
   const a = catCourante.albums[idx];
   document.getElementById('vue-albums').style.display = 'none';
-  document.getElementById('vue-album').style.display = 'flex';
+  const _a = document.getElementById('vue-album'); _a.style.display = 'flex'; _a.style.flex = '1';
   document.getElementById('album-back-label').textContent = catCourante.label;
   document.getElementById('album-back-btn').onclick = () => showAlbums(catCourante.categorie);
   document.getElementById('album-titre-bar').textContent = a.titre;
