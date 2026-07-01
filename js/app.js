@@ -103,6 +103,113 @@ async function loadSorties() {
 }
 
 
+/* ===== GÉOLOCALISATION GPS ===== */
+const UMAP_BASE = 'https://umap.openstreetmap.fr/fr/map/assemblage-des-randonnees-var_705776';
+let gpsWatch = null;
+
+function maPosition() {
+  const btn   = document.getElementById('btn-gps');
+  const label = document.getElementById('gps-label');
+  const iframe = document.getElementById('carte-iframe');
+
+  if (!navigator.geolocation) {
+    alert('La géolocalisation n\'est pas disponible sur cet appareil.');
+    return;
+  }
+
+  /* Si déjà en suivi → arrêter */
+  if (gpsWatch !== null) {
+    navigator.geolocation.clearWatch(gpsWatch);
+    gpsWatch = null;
+    label.textContent = 'Me localiser';
+    btn.style.background = '#1D9E75';
+    btn.querySelector('i').className = 'ti ti-current-location';
+    return;
+  }
+
+  /* Démarrer la localisation */
+  label.textContent = 'Localisation…';
+  btn.style.background = '#BA7517';
+  btn.querySelector('i').className = 'ti ti-loader';
+
+  navigator.geolocation.getCurrentPosition(
+    /* Succès */
+    (pos) => {
+      const lat = pos.coords.latitude.toFixed(6);
+      const lon = pos.coords.longitude.toFixed(6);
+      const acc = Math.round(pos.coords.accuracy);
+
+      /* Centrer uMap sur la position GPS au zoom 16 */
+      const url = UMAP_BASE
+        + '?scaleControl=false&miniMap=false&scrollWheelZoom=true'
+        + '&zoomControl=true&allowEdit=false&moreControl=false'
+        + '&searchControl=false&tilelayersControl=false'
+        + '&embedControl=false&datalayersControl=false'
+        + '&onLoadPanel=none&captionBar=false'
+        + '#16/' + lat + '/' + lon;
+
+      if (iframe) iframe.src = url;
+
+      label.textContent = 'Suivi actif';
+      btn.style.background = '#0F6E56';
+      btn.querySelector('i').className = 'ti ti-current-location';
+
+      /* Afficher la précision brièvement */
+      const info = document.createElement('div');
+      info.textContent = '📍 Précision ±' + acc + ' m';
+      info.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);'
+        + 'background:rgba(15,110,86,.92);color:#fff;padding:7px 14px;border-radius:20px;'
+        + 'font-size:12px;z-index:999;pointer-events:none';
+      document.body.appendChild(info);
+      setTimeout(() => info.remove(), 3000);
+
+      /* Suivi continu toutes les 10 secondes */
+      gpsWatch = navigator.geolocation.watchPosition(
+        (p) => {
+          const la = p.coords.latitude.toFixed(6);
+          const lo = p.coords.longitude.toFixed(6);
+          if (iframe) {
+            iframe.src = UMAP_BASE
+              + '?scaleControl=false&miniMap=false&scrollWheelZoom=true'
+              + '&zoomControl=true&allowEdit=false&moreControl=false'
+              + '&searchControl=false&tilelayersControl=false'
+              + '&embedControl=false&datalayersControl=false'
+              + '&onLoadPanel=none&captionBar=false'
+              + '#16/' + la + '/' + lo;
+          }
+        },
+        () => {},
+        { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
+      );
+    },
+    /* Erreur */
+    (err) => {
+      label.textContent = 'Me localiser';
+      btn.style.background = '#1D9E75';
+      btn.querySelector('i').className = 'ti ti-current-location';
+      const msgs = {
+        1: 'Permission refusée. Autorisez la localisation dans les paramètres du navigateur.',
+        2: 'Position indisponible. Vérifiez que le GPS est activé.',
+        3: 'Délai dépassé. Réessayez en extérieur.'
+      };
+      alert(msgs[err.code] || 'Erreur de géolocalisation.');
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
+}
+
+/* Arrêter le suivi GPS si on quitte l'onglet carte */
+function stopGps() {
+  if (gpsWatch !== null) {
+    navigator.geolocation.clearWatch(gpsWatch);
+    gpsWatch = null;
+    const label = document.getElementById('gps-label');
+    const btn   = document.getElementById('btn-gps');
+    if (label) label.textContent = 'Me localiser';
+    if (btn)   { btn.style.background = '#1D9E75'; btn.querySelector('i').className = 'ti ti-current-location'; }
+  }
+}
+
 /* ===== BANNIÈRES WEBMASTER ===== */
 async function loadBannieres() {
   const url = getJsonUrl().replace('sorties/2025.json', 'sorties/bannieres.json');
@@ -205,6 +312,8 @@ function navTo(id) {
     document.getElementById('topbar-sub').textContent   = t.sub;
   }
   document.getElementById('screen').scrollTop = 0;
+  /* Arrêter GPS si on quitte la carte */
+  if (sid !== 's-carte') stopGps();
 }
 
 /* ===== CARDS ===== */
@@ -250,7 +359,9 @@ function renderAccueil() {
 
   if (p) {
     document.getElementById('hero-eyebrow').textContent = 'Prochaine sortie · ' + capitalize(fmtDate(p.date));
-    document.getElementById('hero-title').textContent   = p.intitule;
+    const htEl = document.getElementById('hero-title');
+  htEl.textContent = p.intitule;
+  htEl.style.opacity = '1';
     document.getElementById('hero-sub').textContent     = 'Animateur · ' + p.animateur;
     document.getElementById('hero-chips').innerHTML     =
       `<span class="chip"><i class="ti ti-map-2" aria-hidden="true"></i> ${p.distance_km} km</span>` +
@@ -262,7 +373,9 @@ function renderAccueil() {
     document.getElementById('hero-card').onclick = () => showDetailByIndex(hi);
   } else {
     document.getElementById('hero-eyebrow').textContent = 'Aucune sortie prévue';
-    document.getElementById('hero-title').textContent   = 'Calendrier à venir';
+    const htEl2 = document.getElementById('hero-title');
+    htEl2.textContent = 'Calendrier à venir';
+    htEl2.style.opacity = '1';
     document.getElementById('hero-sub').textContent     = '';
     document.getElementById('hero-chips').innerHTML     = '';
   }
