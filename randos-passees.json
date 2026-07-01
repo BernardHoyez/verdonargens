@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liste de diffusion — Rando Var</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <a href="../index.html" class="back-link"><i class="ti ti-arrow-left"></i></a>
+      <img src="../icons/logo-vert.png" alt="V.A.R." style="height:28px;width:auto;object-fit:contain;margin-left:4px">
+      <div>
+        <div id="topbar-title">Liste de diffusion</div>
+        <div id="topbar-sub">Informations par email</div>
+      </div>
+    </div>
+  </div>
+  <div id="screen" style="flex:1;overflow-y:auto">
+
+    <div class="page-hero" style="background:#E1F5EE;border-color:#9FE1CB">
+      <i class="ti ti-mail page-hero-icon" style="color:#0F6E56"></i>
+      <h1 class="page-hero-title" style="color:#085041">Liste de diffusion</h1>
+      <p class="page-hero-sub" style="color:#1D9E75">Restez informés des sorties et actualités du club</p>
+    </div>
+
+    <div class="page-section">
+      <h2>Recevoir les infos du club</h2>
+      <p>La liste de diffusion vous permet de recevoir par email :</p>
+      <div class="icon-list">
+        <div class="icon-item"><i class="ti ti-calendar-event"></i><span>Annonce des prochaines sorties</span></div>
+        <div class="icon-item"><i class="ti ti-photo"></i><span>Comptes-rendus et photos des randonnées passées</span></div>
+        <div class="icon-item"><i class="ti ti-info-circle"></i><span>Informations pratiques et actualités du club</span></div>
+        <div class="icon-item"><i class="ti ti-alert-triangle"></i><span>Modifications ou annulations de sorties</span></div>
+      </div>
+    </div>
+
+    <div class="page-section">
+      <h2>S'inscrire</h2>
+      <p>Pour rejoindre la liste de diffusion, envoyez un email au webmaster avec votre prénom, nom et adresse email :</p>
+      <a href="mailto:bhoyez@gmail.com?subject=Inscription liste de diffusion&body=Bonjour,%0D%0A%0D%0AJe souhaite m'inscrire à la liste de diffusion du club de randonnée de Carcès.%0D%0A%0D%0APrenom : %0D%0ANom : %0D%0AEmail : %0D%0A%0D%0ACordialement"
+         class="btn-primary-full">
+        <i class="ti ti-mail"></i> Demander l'inscription
+      </a>
+    </div>
+
+    <div class="page-section">
+      <h2>Se désinscrire</h2>
+      <p>Pour ne plus recevoir les emails, contactez le webmaster :</p>
+      <a href="mailto:bhoyez@gmail.com?subject=Désinscription liste de diffusion"
+         class="btn-outline-full">
+        <i class="ti ti-mail-off"></i> Demander la désinscription
+      </a>
+    </div>
+
+    <div class="page-section">
+      <h2>Fréquence des envois</h2>
+      <p>En moyenne [X] emails par mois. Aucun spam, aucune publicité. Vos données ne sont pas partagées avec des tiers.</p>
+    </div>
+
+  </div>
+</div>
+<script src="../js/pages.js"></script>
+</body>
+</html>

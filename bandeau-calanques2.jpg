@@ -1,0 +1,24 @@
+name: Keep-alive (ping site)
+
+# Évite la mise en veille éventuelle de l'hébergeur
+# et vérifie que le site répond bien chaque semaine.
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'   # Tous les lundis à 7h UTC
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping GitHub Pages
+        run: |
+          STATUS=$(curl -o /dev/null -s -w "%{http_code}" \
+            https://BernardHoyez.github.io/verdonargens/)
+          echo "HTTP status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "ERREUR : le site ne répond pas (status $STATUS)"
+            exit 1
+          fi
+          echo "Site opérationnel."

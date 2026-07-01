@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galerie — V.A.R.</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/pages.css">
+  <link rel="stylesheet" href="../css/galerie.css">
+</head>
+<body style="height:100dvh;overflow:hidden">
+<div id="app" style="height:100dvh;display:flex;flex-direction:column;overflow:hidden">
+
+  <div id="topbar" style="flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:10px;flex:1">
+      <a href="../index.html" class="back-link"><i class="ti ti-arrow-left"></i></a>
+      <img src="../icons/logo-vert.png" alt="V.A.R." style="height:28px;width:auto;object-fit:contain;margin-left:4px">
+      <div>
+        <div id="topbar-title">Galerie</div>
+        <div id="topbar-sub">Photos & vidéos</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VUE 1 : Sélection de catégorie -->
+  <div id="vue-categories" style="flex:1;overflow-y:auto;min-height:0">
+    <div class="page-hero" style="background:linear-gradient(160deg,#0F6E56,#1D9E75);padding:20px 16px;text-align:center;border:none">
+      <i class="ti ti-photo" style="font-size:32px;color:rgba(255,255,255,.8);display:block;margin-bottom:6px"></i>
+      <div style="font-size:18px;font-weight:600;color:#fff;margin-bottom:4px">Galeries photos</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.75)">Souvenirs de nos randonnées</div>
+    </div>
+    <div id="cat-grid" class="cat-grid"></div>
+  </div>
+
+  <!-- VUE 2 : Liste des albums d'une catégorie -->
+  <div id="vue-albums" style="display:none;flex:1;overflow-y:auto;min-height:0">
+    <div class="section-bar">
+      <button class="section-back" onclick="showCategories()">
+        <i class="ti ti-arrow-left"></i> Galerie
+      </button>
+      <span id="albums-titre">Albums</span>
+    </div>
+    <div id="albums-list"></div>
+  </div>
+
+  <!-- VUE 3 : Album Google Photos en iframe -->
+  <div id="vue-album" style="display:none;flex-direction:column;min-height:0">
+
+    <!-- Topbar section -->
+    <div class="section-bar" style="flex-shrink:0">
+      <button class="section-back" id="album-back-btn">
+        <i class="ti ti-arrow-left"></i> <span id="album-back-label">Albums</span>
+      </button>
+      <span id="album-titre-bar" style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px"></span>
+    </div>
+
+    <!-- Contenu centré -->
+    <div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;background:#f5f5f0;gap:20px">
+
+      <!-- Icône décorative -->
+      <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#1D9E75,#0F6E56);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(29,158,117,.3)">
+        <i class="ti ti-photo" style="font-size:36px;color:#fff"></i>
+      </div>
+
+      <!-- Titre et infos -->
+      <div style="text-align:center">
+        <div id="album-titre-gd" style="font-size:16px;font-weight:600;color:#1a1a18;line-height:1.4;margin-bottom:8px"></div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px;font-size:13px;color:#888">
+          <span><i class="ti ti-calendar" style="font-size:14px;vertical-align:-2px;margin-right:3px"></i><span id="album-date"></span></span>
+          <span>·</span>
+          <span><i class="ti ti-photo" style="font-size:14px;vertical-align:-2px;margin-right:3px"></i><span id="album-nb"></span></span>
+        </div>
+      </div>
+
+      <!-- Explication -->
+      <div style="background:#fff;border-radius:10px;padding:14px 16px;text-align:center;font-size:13px;color:#555;line-height:1.6;max-width:320px;border:1px solid #e8e8e4">
+        <i class="ti ti-info-circle" style="font-size:16px;color:#1D9E75;display:block;margin-bottom:6px"></i>
+        Les albums Google Photos ne peuvent pas être affichés directement dans l'application.<br>
+        Appuyez sur le bouton ci-dessous pour les ouvrir dans Google Photos.
+      </div>
+
+      <!-- Bouton principal -->
+      <a id="album-open-link" href="#" target="_blank" rel="noopener"
+        style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;font-size:14px;font-weight:600;background:#1D9E75;color:#fff;border-radius:10px;text-decoration:none;width:100%;max-width:320px;box-shadow:0 2px 8px rgba(29,158,117,.3)">
+        <i class="ti ti-brand-google-photos" style="font-size:18px"></i>
+        Ouvrir dans Google Photos
+      </a>
+
+      <!-- Lien secondaire -->
+      <a id="album-open-link2" href="#" target="_blank" rel="noopener"
+        style="font-size:12px;color:#1D9E75;text-decoration:underline;text-underline-offset:3px">
+        Ou copier le lien de l'album
+      </a>
+
+    </div>
+  </div>
+
+</div>
+<script>
+const BASE_JSON = '../sorties/galeries.json';
+let galeries = [];
+let catCourante = null;
+
+async function init() {
+  try {
+    const r = await fetch(BASE_JSON, { cache: 'no-store' });
+    galeries = await r.json();
+    renderCategories();
+  } catch(e) {
+    document.getElementById('cat-grid').innerHTML =
+      '<div style="padding:24px;text-align:center;color:#aaa;font-size:13px;">Impossible de charger les galeries.</div>';
+  }
+}
+
+function renderCategories() {
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = galeries.map(g => `
+    <div class="cat-card" onclick="showAlbums('${g.categorie}')" style="--cat-color:${g.couleur}">
+      <div class="cat-icon"><i class="ti ${g.icone}"></i></div>
+      <div class="cat-label">${g.label}</div>
+      <div class="cat-count">${g.albums.length} album${g.albums.length > 1 ? 's' : ''}</div>
+      <i class="ti ti-chevron-right cat-chevron"></i>
+    </div>
+  `).join('');
+}
+
+function showCategories() {
+  document.getElementById('vue-categories').style.display = '';
+  document.getElementById('vue-albums').style.display = 'none';
+  document.getElementById('vue-album').style.display = 'none'; document.getElementById('vue-album').style.flex = '';
+}
+
+function showAlbums(categorie) {
+  catCourante = galeries.find(g => g.categorie === categorie);
+  if (!catCourante) return;
+  document.getElementById('vue-categories').style.display = 'none';
+  document.getElementById('vue-albums').style.display = '';
+  document.getElementById('vue-album').style.display = 'none'; document.getElementById('vue-album').style.flex = '';
+  document.getElementById('albums-titre').textContent = catCourante.label;
+
+  const list = document.getElementById('albums-list');
+  list.innerHTML = catCourante.albums.map((a, i) => `
+    <div class="album-card" onclick="showAlbum(${i})">
+      <div class="album-card-icon" style="background:${catCourante.couleur}20;color:${catCourante.couleur}">
+        <i class="ti ${catCourante.icone}" style="font-size:24px"></i>
+      </div>
+      <div class="album-card-info">
+        <div class="album-card-titre">${a.titre}</div>
+        <div class="album-card-meta">${fmtDate(a.date)} · ${a.nb_photos} photos</div>
+      </div>
+      <i class="ti ti-chevron-right" style="color:#ccc;font-size:16px;flex-shrink:0"></i>
+    </div>
+  `).join('');
+}
+
+function showAlbum(idx) {
+  const a = catCourante.albums[idx];
+  document.getElementById('vue-albums').style.display = 'none';
+  const _a = document.getElementById('vue-album'); _a.style.display = 'flex'; _a.style.flex = '1';
+  document.getElementById('album-back-label').textContent = catCourante.label;
+  document.getElementById('album-back-btn').onclick = () => showAlbums(catCourante.categorie);
+  document.getElementById('album-titre-bar').textContent = a.titre;
+  document.getElementById('album-date').textContent = fmtDate(a.date);
+  document.getElementById('album-nb').textContent = a.nb_photos + ' photo' + (a.nb_photos > 1 ? 's' : '');
+  document.getElementById('album-titre-gd').textContent = a.titre;
+  document.getElementById('album-open-link').href = a.url_album;
+  document.getElementById('album-open-link2').href = a.url_album;
+}
+
+function fmtDate(iso) {
+  if (!iso) return '';
+  const [y,m,d] = iso.split('-');
+  const mois = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
+  return parseInt(d) + ' ' + mois[parseInt(m)-1] + ' ' + y;
+}
+
+init();
+</script>
+</body>
+</html>

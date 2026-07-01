@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Randonnées passées — V.A.R.</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/pages.css">
+  <link rel="stylesheet" href="../css/galerie.css">
+  <link rel="stylesheet" href="../css/randos-passees.css">
+</head>
+<body style="height:100dvh;overflow:hidden">
+<div id="app" style="height:100dvh;display:flex;flex-direction:column;overflow:hidden">
+
+  <div id="topbar" style="flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:10px;flex:1">
+      <button class="back-link" id="btn-back" onclick="goBack()" style="background:none;border:none;padding:0;cursor:pointer">
+        <i class="ti ti-arrow-left" style="font-size:20px;color:#1D9E75"></i>
+      </button>
+      <img src="../icons/logo-vert.png" alt="V.A.R." style="height:28px;width:auto;object-fit:contain;margin-left:4px">
+      <div>
+        <div id="topbar-title">Randos passées</div>
+        <div id="topbar-sub">Dimanche</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VUE 1 : Grille des catégories -->
+  <div id="vue-categories" style="overflow-y:auto;flex:1;min-height:0">
+    <div style="background:linear-gradient(160deg,#085041,#1D9E75);padding:20px 16px;text-align:center">
+      <i class="ti ti-history" style="font-size:32px;color:rgba(255,255,255,.8);display:block;margin-bottom:6px"></i>
+      <div style="font-size:18px;font-weight:600;color:#fff;margin-bottom:4px">Randonnées passées</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.75)">Archives de nos sorties</div>
+    </div>
+    <div id="cat-grid" class="cat-grid"></div>
+    <div style="margin:12px 16px;padding:10px 12px;background:#FFF8E6;border-radius:8px;border:1px solid #EFD48A;font-size:12px;color:#6B4A00;line-height:1.5">
+      <i class="ti ti-alert-triangle" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>
+      <strong>Note :</strong> Les tracés ne sont donnés que pour mémoire. Nos animateurs empruntent parfois des chemins privés avec autorisation ponctuelle. Vérifiez l'accessibilité avant de refaire un parcours.
+    </div>
+  </div>
+
+  <!-- VUE 2 : Liste chronologique d'une catégorie -->
+  <div id="vue-liste" style="display:none;overflow-y:auto;flex:1;min-height:0">
+    <div id="liste-content"></div>
+    <div style="margin:12px 16px 24px;padding:10px 12px;background:#FFF8E6;border-radius:8px;border:1px solid #EFD48A;font-size:12px;color:#6B4A00;line-height:1.5">
+      <i class="ti ti-alert-triangle" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>
+      Les tracés ne sont donnés que pour mémoire. Vérifiez l'accessibilité avant de refaire un parcours.
+    </div>
+  </div>
+
+  <!-- VUE 3 : Carte uMap d'une rando -->
+  <div id="vue-carte" style="display:none;flex-direction:column;min-height:0">
+    <div id="carte-info" class="rando-past-hero" style="flex-shrink:0"></div>
+    <div style="flex:1;min-height:0;position:relative;overflow:hidden">
+      <iframe id="carte-iframe" src="" title="Tracé" allowfullscreen loading="lazy"
+        style="position:absolute;inset:0;width:100%;height:100%;border:none;display:block"></iframe>
+    </div>
+    <div style="padding:10px 16px;background:#fff;border-top:1px solid #eee;display:flex;gap:8px;flex-shrink:0">
+      <a id="carte-open-link" href="#" target="_blank" rel="noopener"
+        style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;font-size:13px;font-weight:500;background:#1D9E75;color:#fff;border:none;border-radius:8px;text-decoration:none">
+        <i class="ti ti-external-link"></i> Ouvrir la carte
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const BASE_JSON = '../sorties/randos-passees.json';
+let data = [];
+let catCourante = null;
+let vue = 'categories';
+
+async function init() {
+  try {
+    const r = await fetch(BASE_JSON, { cache: 'no-store' });
+    data = await r.json();
+    renderCategories();
+  } catch(e) {
+    document.getElementById('cat-grid').innerHTML =
+      '<div style="padding:24px;text-align:center;color:#aaa;font-size:13px">Impossible de charger les données.</div>';
+  }
+}
+
+function setVue(v) {
+  vue = v;
+  const cat   = document.getElementById('vue-categories');
+  const liste = document.getElementById('vue-liste');
+  const carte = document.getElementById('vue-carte');
+  /* Toutes les vues occupent flex:1 sauf quand cachées */
+  cat.style.display   = v==='categories' ? 'block' : 'none';
+  cat.style.flex      = v==='categories' ? '1'     : '';
+  liste.style.display = v==='liste'      ? 'block' : 'none';
+  liste.style.flex    = v==='liste'      ? '1'     : '';
+  carte.style.display = v==='carte'      ? 'flex'  : 'none';
+  carte.style.flex    = v==='carte'      ? '1'     : '';
+}
+
+function goBack() {
+  if (vue === 'carte')      { setVue('liste');      document.getElementById('topbar-title').textContent = catCourante.label; }
+  else if (vue === 'liste') { setVue('categories'); document.getElementById('topbar-title').textContent = 'Randos passées'; document.getElementById('topbar-sub').textContent = ''; }
+  else                      { window.location.href = '../index.html'; }
+}
+
+/* ── Catégories ── */
+function renderCategories() {
+  document.getElementById('topbar-title').textContent = 'Randos passées';
+  document.getElementById('topbar-sub').textContent   = '';
+  document.getElementById('cat-grid').innerHTML = data.map(g => {
+    const total = (g.randos || []).reduce((s, a) => s + (a.entrees||a.randos||[]).length, 0);
+    return `
+    <div class="cat-card" onclick="showListe('${g.categorie}')" style="--cat-color:${g.couleur}">
+      <div class="cat-icon"><i class="ti ${g.icone}"></i></div>
+      <div class="cat-label">${g.label}</div>
+      <div class="cat-count">${total} sortie${total>1?'s':''}</div>
+      <i class="ti ti-chevron-right cat-chevron"></i>
+    </div>`;
+  }).join('');
+  setVue('categories');
+}
+
+/* ── Liste chronologique ── */
+function showListe(categorie) {
+  if (categorie === 'sejours') { showSejours(); return; }
+  catCourante = data.find(g => g.categorie === categorie);
+  if (!catCourante) return;
+  document.getElementById('topbar-title').textContent = catCourante.label;
+  document.getElementById('topbar-sub').textContent   = 'Randonnées passées';
+
+  const annees = catCourante.randos || [];
+  let html = '';
+  annees.forEach(bloc => {
+    html += `<div class="annee-header">${bloc.annee}</div>`;
+    const entrees = bloc.entrees || bloc.randos || [];
+    entrees.forEach((e, i) => {
+      const hasUrl = e.url && e.url.length > 0;
+      const icon = iconForType(e.type || (hasUrl ? 'umap' : 'sans-carte'));
+      const clickable = hasUrl;
+      html += `
+        <div class="rando-row ${clickable ? 'rando-row-link' : ''}"
+             ${clickable ? `onclick="showCarte('${bloc.annee}',${i})"` : ''}>
+          <span class="rando-date">${e.label}</span>
+          <span class="rando-nom">${e.intitule}</span>
+          ${hasUrl ? `<span class="rando-icon">${icon}</span>` : '<span class="rando-icon rando-icon-none"><i class="ti ti-minus" style="font-size:12px;color:#ddd"></i></span>'}
+        </div>`;
+    });
+  });
+  document.getElementById('liste-content').innerHTML = html;
+  setVue('liste');
+}
+
+function iconForType(type) {
+  if (type === 'umap')  return '<i class="ti ti-map-2" style="color:#1D9E75;font-size:16px"></i>';
+  if (type === 'page')  return '<i class="ti ti-file-map" style="color:#0C447C;font-size:16px"></i>';
+  if (type === 'autre') return '<i class="ti ti-external-link" style="color:#888;font-size:15px"></i>';
+  return '';
+}
+
+/* ── Carte ── */
+function showCarte(annee, idx, forceCat) {
+  // Pour les séjours, on utilise l'index flat
+  if (forceCat === 'sejours' || catCourante.categorie === 'sejours') {
+    const e = window._sejoursFlat[idx];
+    if (!e || !e.url) return;
+    document.getElementById('topbar-title').textContent = e.intitule.length > 28 ? e.intitule.slice(0,28)+'…' : e.intitule;
+    document.getElementById('topbar-sub').textContent   = e.label;
+    document.getElementById('carte-info').innerHTML = `
+      <div style="font-size:11px;font-weight:500;color:#5A1F8C;margin-bottom:3px">${e.label}</div>
+      <div style="font-size:15px;font-weight:600;color:#3A1060;line-height:1.3">${e.intitule}</div>
+    `;
+    if (e.type === 'autre') { window.open(e.url, '_blank'); return; }
+    document.getElementById('carte-iframe').src = e.url;
+    document.getElementById('carte-open-link').href = e.url;
+    setVue('carte');
+    return;
+  }
+  const bloc = catCourante.randos.find(b => b.annee == annee);
+  const entrees = bloc.entrees || bloc.randos || [];
+  const e = entrees[idx];
+  if (!e || !e.url) return;
+
+  document.getElementById('topbar-title').textContent = e.intitule.length > 28 ? e.intitule.slice(0,28)+'…' : e.intitule;
+  document.getElementById('topbar-sub').textContent   = e.label + ' ' + annee;
+
+  document.getElementById('carte-info').innerHTML = `
+    <div style="font-size:11px;font-weight:500;color:#1D9E75;margin-bottom:3px">${e.label} ${annee}</div>
+    <div style="font-size:15px;font-weight:600;color:#085041;line-height:1.3">${e.intitule}</div>
+  `;
+
+  // Construire URL iframe selon le type
+  let iframeSrc = e.url;
+  if (e.type === 'page') {
+    // Page Google Sites → ouvrir dans un onglet directement
+    window.open(e.url, '_blank');
+    return;
+  }
+  // Pour uMap : ajouter ?scrollWheelZoom=true si pas déjà présent
+  if (e.type === 'umap' && !iframeSrc.includes('?')) {
+    iframeSrc = iframeSrc + (iframeSrc.includes('#') ?
+      iframeSrc.replace('#', '?scrollWheelZoom=true&miniMap=false#') :
+      '?scrollWheelZoom=true&miniMap=false');
+  }
+
+  document.getElementById('carte-iframe').src = iframeSrc;
+  document.getElementById('carte-open-link').href = e.url;
+  setVue('carte');
+}
+
+/* ── Séjours — affichage spécial ── */
+function showSejours() {
+  catCourante = data.find(g => g.categorie === 'sejours');
+  if (!catCourante) return;
+  document.getElementById('topbar-title').textContent = 'Séjours';
+  document.getElementById('topbar-sub').textContent   = 'Randonnées passées';
+
+  // Toutes les entrées triées par année décroissante
+  const toutes = [];
+  catCourante.randos.sort((a,b) => b.annee - a.annee).forEach(bloc => {
+    (bloc.entrees || []).forEach(e => toutes.push({...e, annee: bloc.annee}));
+  });
+
+  let html = '<div class="annee-header" style="background:#5A1F8C">Séjours</div>';
+  toutes.forEach((e, i) => {
+    const hasUrl = e.url && e.url.length > 0;
+    html += `
+      <div class="sejour-card ${hasUrl ? '' : ''}" ${hasUrl ? `onclick="showCarte('${e.annee}',${i},'sejours')"` : ''}>
+        <div class="sejour-card-header">
+          <div>
+            <div class="sejour-titre">${e.intitule}</div>
+            <div class="sejour-label">${e.label}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="sejour-annee-badge">${e.annee}</span>
+            ${hasUrl ? iconForType(e.type) : ''}
+          </div>
+        </div>
+      </div>`;
+  });
+
+  // Stocker pour showCarte
+  window._sejoursFlat = toutes;
+  document.getElementById('liste-content').innerHTML = html;
+  setVue('liste');
+}
+
+init();
+</script>
+</body>
+</html>

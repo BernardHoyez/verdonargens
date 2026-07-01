@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statuts — Rando Var</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <a href="../index.html" class="back-link"><i class="ti ti-arrow-left"></i></a>
+      <img src="../icons/logo-vert.png" alt="V.A.R." style="height:28px;width:auto;object-fit:contain;margin-left:4px">
+      <div>
+        <div id="topbar-title">Statuts & règlement</div>
+        <div id="topbar-sub">Documents officiels</div>
+      </div>
+    </div>
+  </div>
+  <div id="screen" style="flex:1;overflow-y:auto">
+
+    <div class="page-hero" style="background:#F0EBF9;border-color:#C39FE8">
+      <i class="ti ti-file-text page-hero-icon" style="color:#5A1F8C"></i>
+      <h1 class="page-hero-title" style="color:#3A1060">Documents officiels</h1>
+      <p class="page-hero-sub" style="color:#5A1F8C">Association loi 1901</p>
+    </div>
+
+    <div class="page-section">
+      <h2>Statuts de l'association</h2>
+      <p>Les statuts définissent l'objet, le fonctionnement et l'organisation du club de randonnée de Carcès, association déclarée sous la loi du 1er juillet 1901.</p>
+      <a href="#" class="btn-outline-full">
+        <i class="ti ti-download"></i> Télécharger les statuts (PDF)
+      </a>
+    </div>
+
+    <div class="page-section">
+      <h2>Règlement intérieur</h2>
+      <p>Le règlement intérieur précise les règles de fonctionnement des sorties, les responsabilités des participants et les conditions d'utilisation de l'application.</p>
+      <a href="#" class="btn-outline-full">
+        <i class="ti ti-download"></i> Télécharger le règlement (PDF)
+      </a>
+    </div>
+
+    <div class="page-section">
+      <h2>Règles essentielles des sorties</h2>
+      <div class="icon-list">
+        <div class="icon-item"><i class="ti ti-shield-check"></i><span>Chaque participant est responsable de son équipement et de sa condition physique</span></div>
+        <div class="icon-item"><i class="ti ti-user-check"></i><span>L'animateur est le responsable de la sortie — ses consignes sont à respecter</span></div>
+        <div class="icon-item"><i class="ti ti-phone"></i><span>Signaler tout problème de santé ou incident à l'animateur</span></div>
+        <div class="icon-item"><i class="ti ti-leaf"></i><span>Respect de l'environnement : ne rien laisser sur les sentiers</span></div>
+        <div class="icon-item"><i class="ti ti-clock"></i><span>Être ponctuel au lieu de départ — ne pas mettre en retard le groupe</span></div>
+      </div>
+    </div>
+
+    <div class="page-section">
+      <h2>Affiliation</h2>
+      <div class="icon-list">
+        <div class="icon-item"><i class="ti ti-certificate"></i><span>Affilié à la Fédération Française de la Randonnée Pédestre (FFRandonnée)</span></div>
+        <div class="icon-item"><i class="ti ti-shield"></i><span>Assurance responsabilité civile incluse dans la cotisation</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script src="../js/pages.js"></script>
+</body>
+</html>
