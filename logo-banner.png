@@ -110,3 +110,21 @@
 .step-desc    { font-size: 12px; color: #666; line-height: 1.5; }
 
 .page-footer  { padding: 16px; }
+
+/* ── Mise à jour thème nature pour pages secondaires ── */
+:root {
+  --vert-foret:  #1A6B4A;
+  --vert-mousse: #2D9B6F;
+  --vert-pale:   #E6F4EE;
+}
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+.back-link { color: var(--vert-foret); }
+.btn-primary-full {
+  background: linear-gradient(135deg, var(--vert-foret), var(--vert-mousse));
+  box-shadow: 0 2px 8px rgba(26,107,74,.25);
+  transition: all .18s ease;
+}
+.btn-primary-full:active { transform: scale(.97); }
+.btn-outline-full { color: var(--vert-foret); border-color: var(--vert-foret); }
+.icon-item i { color: var(--vert-mousse); }
+.steps-list .step-num { background: linear-gradient(135deg, var(--vert-foret), var(--vert-mousse)); }

@@ -1,88 +1,28 @@
-/* ============================================================
-   Service Worker — Rando Var  |  BRISE-CACHE
-   Incrémenter CACHE_VERSION à chaque déploiement :
-   tous les navigateurs téléchargeront la nouvelle version.
-   ============================================================ */
-
-const CACHE_VERSION = 'v1.0.5';
-const CACHE_NAME    = 'rando-var-' + CACHE_VERSION;
-
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './css/app.css',
-  './js/app.js',
-  './js/formulaire.js',
-  './icons/icon192.png',
-  './icons/icon512.png'
-  /* NE PAS mettre sorties/2025.json ici :
-     il doit toujours être rechargé depuis le réseau */
-];
-
-/* ── INSTALL : mise en cache des assets statiques ── */
-self.addEventListener('install', event => {
-  console.log('[SW] Install', CACHE_NAME);
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(ASSETS))
-      .then(() => self.skipWaiting())   /* active immédiatement sans attendre */
-  );
-});
-
-/* ── ACTIVATE : suppression de TOUS les anciens caches (brise-cache) ── */
-self.addEventListener('activate', event => {
-  console.log('[SW] Activate', CACHE_NAME);
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(k => k !== CACHE_NAME)   /* conserver seulement la version courante */
-          .map(k => {
-            console.log('[SW] Suppression cache obsolète :', k);
-            return caches.delete(k);
-          })
-      )
-    ).then(() => self.clients.claim())    /* prend le contrôle de tous les onglets */
-  );
-});
-
-/* ── FETCH : stratégie mixte ── */
-self.addEventListener('fetch', event => {
-  const url = event.request.url;
-
-  /* Laisser passer les requêtes cross-origin (uMap, CDN tabler-icons…) */
-  if (!url.startsWith(self.location.origin)) return;
-
-  /* ► Network-FIRST pour le JSON des sorties
-       → toujours la version la plus récente du serveur
-       → fallback cache si hors connexion                */
-  if (url.includes('sorties/') && url.endsWith('.json')) {
-    event.respondWith(
-      fetch(event.request, { cache: 'no-store' })
-        .then(response => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
-          return response;
-        })
-        .catch(() => caches.match(event.request))
-    );
-    return;
+[
+  {
+    "id": "2026-06-20-montgenevre",
+    "date_debut": "2026-06-20",
+    "date_fin": "2026-06-27",
+    "intitule": "Séjour Montgenèvre",
+    "lieu": "Montgenèvre, Hautes-Alpes",
+    "hebergement": "Village Club du Soleil à Montgenèvre",
+    "url_hebergement": "https://www.villagesclubsdusoleil.com/fr/nos-destinations/hiver/sejour-a-la-montagne/montgenevre",
+    "prix": "520 € par personne",
+    "inclus": "Pension complète (petit déjeuner, déjeuner ou panier pique-nique, apéritif, dîner, vin à table), 4 journées de randonnées accompagnées de guides, accès infrastructures (piscine extérieure chauffée, salle de sport…), assurance annulation",
+    "programme": "Programme de randonnées envoyé ultérieurement",
+    "notes": ""
+  },
+  {
+    "id": "2026-04-20-villedieu",
+    "date_debut": "2026-04-20",
+    "date_fin": "2026-04-23",
+    "intitule": "Séjour Villedieu",
+    "lieu": "Villedieu, Vaucluse (près de Vaison-la-Romaine)",
+    "hebergement": "Gîte de la Magnanarié",
+    "url_hebergement": "http://www.magnanarie.com/",
+    "prix": "220 € à 295 € selon chambre",
+    "inclus": "Demi-pension, apéritif avec accompagnement, vin à table, taxe de séjour, inscription Génération Mouvement. Panier repas 13 €/personne en option",
+    "programme": "Randonnées de différents niveaux selon animateurs présents",
+    "notes": "Chambre partagée (double ou triple, salle d'eau couloir) : 220 €. Chambre double avec salle d'eau : 235 €. Chambre individuelle : 295 €. Arrivée lundi 20 avril après-midi, départ jeudi 23 avril au matin (3 nuits)."
   }
-
-  /* ► Cache-FIRST pour les assets statiques
-       → réponse instantanée depuis le cache
-       → mise à jour en arrière-plan si en ligne  */
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      const network = fetch(event.request).then(response => {
-        if (response && response.status === 200) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => cached);
-      return cached || network;
-    })
-  );
-});
+]
