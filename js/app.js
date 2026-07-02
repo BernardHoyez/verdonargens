@@ -11,7 +11,8 @@ let sorties = {
 };
 let jourActif  = 'tous';   /* filtre jour */
 let diffActif  = 'tous';   /* filtre difficulté */
-window._sortieIndex = [];
+window._sortieIndex  = [];   /* index accueil */
+window._agendaIndex  = [];   /* index agenda  */
 
 /* Toutes les sorties fusionnées avec tag jour */
 function allSorties() {
@@ -317,9 +318,15 @@ function navTo(id) {
 }
 
 /* ===== CARDS ===== */
-function cardHtml(s) {
-  const idx = window._sortieIndex.length;
-  window._sortieIndex.push(s);
+function cardHtml(s, useAgendaIndex) {
+  let idx;
+  if (useAgendaIndex) {
+    idx = window._agendaIndex.length;
+    window._agendaIndex.push(s);
+  } else {
+    idx = window._sortieIndex.length;
+    window._sortieIndex.push(s);
+  }
   const jour = s._jour || '';
   const jourBadge = jour
     ? `<span style="background:${jourColor(jour)}18;color:${jourColor(jour)};font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;margin-right:4px">${jourLabel(jour)}</span>`
@@ -327,7 +334,8 @@ function cardHtml(s) {
   const meta = s.distance_km
     ? `${jourBadge}${s.distance_km} km · ${s.denivele_m} m · ${badgeHtml(s.difficulte)}`
     : `${jourBadge}${badgeHtml(s.difficulte)}`;
-  return `<div class="rando-card" onclick="showDetailByIndex(${idx})">
+  const agendaParam = useAgendaIndex ? ',true' : '';
+  return `<div class="rando-card" onclick="showDetailByIndex(${idx}${agendaParam})">
     <div class="date-col">
       <div class="date-day">${fmtDay(s.date)}</div>
       <div class="date-mon">${fmtMon(s.date)}</div>
@@ -339,7 +347,11 @@ function cardHtml(s) {
     <i class="ti ti-chevron-right chevron" aria-hidden="true"></i>
   </div>`;
 }
-function showDetailByIndex(idx) { showDetail(window._sortieIndex[idx]); }
+function showDetailByIndex(idx, fromAgenda) {
+  const s = fromAgenda ? window._agendaIndex[idx] : window._sortieIndex[idx];
+  if (s) showDetail(s);
+  else console.error('[VAR] Sortie introuvable idx=' + idx + ' fromAgenda=' + fromAgenda);
+}
 
 /* Etiquette jour */
 function jourLabel(j) {
@@ -351,7 +363,7 @@ function jourColor(j) {
 
 /* ===== SKELETON LOADING ===== */
 function skeletonCard() {
-  return `<div class="rando-card" style="pointer-events:none">
+  return `<div class="rando-card" style="pointer-events:none;opacity:.6">
     <div class="date-col">
       <div class="skeleton" style="width:28px;height:22px;margin:0 auto 4px"></div>
       <div class="skeleton" style="width:24px;height:10px;margin:0 auto"></div>
@@ -363,6 +375,8 @@ function skeletonCard() {
   </div>`;
 }
 function showSkeletons() {
+  window._sortieIndex = [];
+  window._agendaIndex = [];
   const nc = document.getElementById('next-cards');
   const lc = document.getElementById('last-card');
   if (nc) nc.innerHTML = skeletonCard() + skeletonCard() + skeletonCard();
@@ -417,7 +431,7 @@ function renderAccueil() {
 
 /* ===== AGENDA ===== */
 function renderAgenda() {
-  window._sortieIndex = [];
+  window._agendaIndex = [];
 
   /* Filtres combinés : jour + difficulté */
   let all = allSorties().filter(s => isFuture(s.date));
@@ -444,7 +458,7 @@ function renderAgenda() {
   Object.entries(byMonth).forEach(([k, liste]) => {
     const [y, m] = k.split('-');
     html += `<div class="section-title">${moisNoms[parseInt(m)]} ${y}</div>`;
-    html += liste.map(s => cardHtml(s)).join('');
+    html += liste.map(s => cardHtml(s, true)).join('');
   });
 
   document.getElementById('agenda-list').innerHTML = html ||
