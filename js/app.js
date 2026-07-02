@@ -107,11 +107,74 @@ async function loadSorties() {
 /* ===== GÉOLOCALISATION GPS ===== */
 const UMAP_BASE = 'https://umap.openstreetmap.fr/fr/map/assemblage-des-randonnees-var_705776';
 let gpsWatch = null;
+let currentHeading = null;
+let orientationHandler = null;
+
+function umapUrl(lat, lon) {
+  return UMAP_BASE
+    + '?scaleControl=false&miniMap=false&scrollWheelZoom=true'
+    + '&zoomControl=true&allowEdit=false&moreControl=false'
+    + '&searchControl=false&tilelayersControl=false'
+    + '&embedControl=false&datalayersControl=false'
+    + '&onLoadPanel=none&captionBar=false'
+    + '#16/' + lat + '/' + lon;
+}
+
+/* Oriente la flèche selon le cap fourni (degrés, 0 = Nord) */
+function setArrowHeading(heading) {
+  const arrow = document.getElementById('gps-arrow');
+  if (!arrow) return;
+  const icon = arrow.querySelector('i');
+  if (icon && typeof heading === 'number' && !isNaN(heading)) {
+    icon.style.transform = 'rotate(' + heading + 'deg)';
+  }
+}
+
+/* Écoute la boussole du téléphone pour orienter la flèche (nécessite un geste utilisateur sur iOS) */
+function startCompass() {
+  if (orientationHandler) return;
+  orientationHandler = (e) => {
+    let heading = null;
+    if (typeof e.webkitCompassHeading === 'number') {
+      heading = e.webkitCompassHeading; /* iOS : déjà 0 = Nord, sens horaire */
+    } else if (typeof e.alpha === 'number') {
+      heading = 360 - e.alpha; /* Android : alpha 0 = Nord, sens anti-horaire */
+    }
+    if (heading !== null) {
+      currentHeading = heading;
+      setArrowHeading(heading);
+    }
+  };
+
+  const eventName = ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation';
+
+  if (typeof DeviceOrientationEvent !== 'undefined'
+      && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    /* iOS 13+ : la permission doit être demandée suite à un geste utilisateur */
+    DeviceOrientationEvent.requestPermission()
+      .then((state) => {
+        if (state === 'granted') window.addEventListener(eventName, orientationHandler);
+      })
+      .catch(() => {});
+  } else {
+    window.addEventListener(eventName, orientationHandler);
+  }
+}
+
+function stopCompass() {
+  if (orientationHandler) {
+    window.removeEventListener('deviceorientation', orientationHandler);
+    window.removeEventListener('deviceorientationabsolute', orientationHandler);
+    orientationHandler = null;
+  }
+  currentHeading = null;
+}
 
 function maPosition() {
   const btn   = document.getElementById('btn-gps');
   const label = document.getElementById('gps-label');
   const iframe = document.getElementById('carte-iframe');
+  const arrow  = document.getElementById('gps-arrow');
 
   if (!navigator.geolocation) {
     alert('La géolocalisation n\'est pas disponible sur cet appareil.');
@@ -122,9 +185,13 @@ function maPosition() {
   if (gpsWatch !== null) {
     navigator.geolocation.clearWatch(gpsWatch);
     gpsWatch = null;
+    stopCompass();
     label.textContent = 'Me localiser';
     btn.style.background = '#1D9E75';
     btn.querySelector('i').className = 'ti ti-current-location';
+    if (arrow) arrow.style.display = 'none';
+    /* On arrête aussi l'enregistrement en cours, le cas échéant */
+    if (isRecording) toggleRecording();
     return;
   }
 
@@ -141,19 +208,20 @@ function maPosition() {
       const acc = Math.round(pos.coords.accuracy);
 
       /* Centrer uMap sur la position GPS au zoom 16 */
-      const url = UMAP_BASE
-        + '?scaleControl=false&miniMap=false&scrollWheelZoom=true'
-        + '&zoomControl=true&allowEdit=false&moreControl=false'
-        + '&searchControl=false&tilelayersControl=false'
-        + '&embedControl=false&datalayersControl=false'
-        + '&onLoadPanel=none&captionBar=false'
-        + '#16/' + lat + '/' + lon;
-
-      if (iframe) iframe.src = url;
+      if (iframe) iframe.src = umapUrl(lat, lon);
 
       label.textContent = 'Suivi actif';
       btn.style.background = '#0F6E56';
       btn.querySelector('i').className = 'ti ti-current-location';
+
+      /* Afficher la flèche de position au centre de la carte */
+      if (arrow) {
+        arrow.style.display = 'flex';
+        if (typeof pos.coords.heading === 'number' && !isNaN(pos.coords.heading)) {
+          setArrowHeading(pos.coords.heading);
+        }
+      }
+      startCompass();
 
       /* Afficher la précision brièvement */
       const info = document.createElement('div');
@@ -164,20 +232,18 @@ function maPosition() {
       document.body.appendChild(info);
       setTimeout(() => info.remove(), 3000);
 
-      /* Suivi continu toutes les 10 secondes */
+      if (isRecording) addTrackPoint(pos);
+
+      /* Suivi continu */
       gpsWatch = navigator.geolocation.watchPosition(
         (p) => {
           const la = p.coords.latitude.toFixed(6);
           const lo = p.coords.longitude.toFixed(6);
-          if (iframe) {
-            iframe.src = UMAP_BASE
-              + '?scaleControl=false&miniMap=false&scrollWheelZoom=true'
-              + '&zoomControl=true&allowEdit=false&moreControl=false'
-              + '&searchControl=false&tilelayersControl=false'
-              + '&embedControl=false&datalayersControl=false'
-              + '&onLoadPanel=none&captionBar=false'
-              + '#16/' + la + '/' + lo;
+          if (iframe) iframe.src = umapUrl(la, lo);
+          if (typeof p.coords.heading === 'number' && !isNaN(p.coords.heading)) {
+            setArrowHeading(p.coords.heading);
           }
+          if (isRecording) addTrackPoint(p);
         },
         () => {},
         { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
@@ -204,10 +270,144 @@ function stopGps() {
   if (gpsWatch !== null) {
     navigator.geolocation.clearWatch(gpsWatch);
     gpsWatch = null;
+    stopCompass();
     const label = document.getElementById('gps-label');
     const btn   = document.getElementById('btn-gps');
+    const arrow = document.getElementById('gps-arrow');
     if (label) label.textContent = 'Me localiser';
     if (btn)   { btn.style.background = '#1D9E75'; btn.querySelector('i').className = 'ti ti-current-location'; }
+    if (arrow) arrow.style.display = 'none';
+    if (isRecording) toggleRecording();
+  }
+}
+
+/* ===== ENREGISTREMENT DU PARCOURS (GPX / KML) ===== */
+let isRecording = false;
+let trackPoints = [];
+let recordStartTime = null;
+
+function addTrackPoint(pos) {
+  trackPoints.push({
+    lat: pos.coords.latitude,
+    lon: pos.coords.longitude,
+    ele: (typeof pos.coords.altitude === 'number' && !isNaN(pos.coords.altitude)) ? pos.coords.altitude : null,
+    time: new Date().toISOString()
+  });
+  updateRecordStats();
+}
+
+function haversine(a, b) {
+  const R = 6371000;
+  const toRad = (d) => d * Math.PI / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLon = toRad(b.lon - a.lon);
+  const la1 = toRad(a.lat), la2 = toRad(b.lat);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(la1) * Math.cos(la2) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+function trackDistance() {
+  let d = 0;
+  for (let i = 1; i < trackPoints.length; i++) d += haversine(trackPoints[i - 1], trackPoints[i]);
+  return d;
+}
+
+function formatDuration(ms) {
+  const s = Math.floor(ms / 1000);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return (h > 0 ? h + ' h ' : '') + m + ' min ' + sec + ' s';
+}
+
+function updateRecordStats() {
+  const box = document.getElementById('record-stats');
+  const info = document.getElementById('record-info');
+  if (!box || !info) return;
+  if (trackPoints.length === 0) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  const dist = (trackDistance() / 1000).toFixed(2);
+  const dur = recordStartTime ? formatDuration(Date.now() - recordStartTime) : '';
+  info.textContent = trackPoints.length + ' points · ' + dist + ' km' + (dur ? ' · ' + dur : '');
+}
+
+function toggleRecording() {
+  const btn = document.getElementById('btn-record');
+  const label = document.getElementById('record-label');
+  const exportBox = document.getElementById('record-export');
+
+  if (!isRecording) {
+    /* Démarrer l'enregistrement (nécessite le suivi GPS actif) */
+    if (gpsWatch === null) {
+      alert('Activez d\'abord « Me localiser » pour démarrer l\'enregistrement du parcours.');
+      return;
+    }
+    trackPoints = [];
+    recordStartTime = Date.now();
+    isRecording = true;
+    if (label) label.textContent = 'Arrêter';
+    if (btn) btn.style.background = '#7A1D10';
+    if (exportBox) exportBox.style.display = 'none';
+    updateRecordStats();
+  } else {
+    /* Arrêter l'enregistrement */
+    isRecording = false;
+    if (label) label.textContent = 'Enregistrer';
+    if (btn) btn.style.background = '#BA2E1D';
+    if (exportBox) exportBox.style.display = trackPoints.length > 1 ? 'flex' : 'none';
+    if (trackPoints.length <= 1) alert('Trop peu de points enregistrés pour générer un fichier.');
+  }
+}
+
+function clearTrack() {
+  trackPoints = [];
+  recordStartTime = null;
+  const box = document.getElementById('record-stats');
+  const exportBox = document.getElementById('record-export');
+  if (box) box.style.display = 'none';
+  if (exportBox) exportBox.style.display = 'none';
+}
+
+function downloadFile(filename, content, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function buildGPX() {
+  const pts = trackPoints.map(p =>
+    '      <trkpt lat="' + p.lat + '" lon="' + p.lon + '">'
+    + (p.ele !== null ? '<ele>' + p.ele.toFixed(1) + '</ele>' : '')
+    + '<time>' + p.time + '</time></trkpt>'
+  ).join('\n');
+  return '<?xml version="1.0" encoding="UTF-8"?>\n'
+    + '<gpx version="1.1" creator="Rando Var" xmlns="http://www.topografix.com/GPX/1/1">\n'
+    + '  <trk>\n    <name>Parcours Rando Var</name>\n    <trkseg>\n'
+    + pts + '\n    </trkseg>\n  </trk>\n</gpx>';
+}
+
+function buildKML() {
+  const coords = trackPoints.map(p => p.lon + ',' + p.lat + ',' + (p.ele !== null ? p.ele.toFixed(1) : 0)).join(' ');
+  return '<?xml version="1.0" encoding="UTF-8"?>\n'
+    + '<kml xmlns="http://www.opengis.net/kml/2.2">\n  <Document>\n    <name>Parcours Rando Var</name>\n'
+    + '    <Placemark>\n      <name>Trace GPS</name>\n      <LineString>\n'
+    + '        <tessellate>1</tessellate>\n        <coordinates>' + coords + '</coordinates>\n'
+    + '      </LineString>\n    </Placemark>\n  </Document>\n</kml>';
+}
+
+function exportTrack(format) {
+  if (trackPoints.length < 2) { alert('Aucun parcours enregistré à exporter.'); return; }
+  const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
+  if (format === 'gpx') {
+    downloadFile('parcours-' + stamp + '.gpx', buildGPX(), 'application/gpx+xml');
+  } else {
+    downloadFile('parcours-' + stamp + '.kml', buildKML(), 'application/vnd.google-earth.kml+xml');
   }
 }
 

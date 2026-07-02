@@ -147,18 +147,42 @@
             allowfullscreen
             loading="lazy">
           </iframe>
+          <div id="gps-arrow" class="gps-arrow" style="display:none">
+            <i class="ti ti-navigation" aria-hidden="true"></i>
+          </div>
         </div>
         <div class="carte-footer">
-          <span>Source : votre carte uMap</span>
-          <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             <button id="btn-gps" onclick="maPosition()"
               style="display:flex;align-items:center;gap:5px;padding:5px 10px;font-size:12px;font-weight:500;background:#1D9E75;color:#fff;border:none;border-radius:6px;cursor:pointer">
               <i class="ti ti-current-location" style="font-size:14px" aria-hidden="true"></i>
               <span id="gps-label">Me localiser</span>
             </button>
+            <button id="btn-record" onclick="toggleRecording()"
+              style="display:flex;align-items:center;gap:5px;padding:5px 10px;font-size:12px;font-weight:500;background:#BA2E1D;color:#fff;border:none;border-radius:6px;cursor:pointer">
+              <i class="ti ti-player-record" style="font-size:14px" aria-hidden="true"></i>
+              <span id="record-label">Enregistrer</span>
+            </button>
             <a href="https://umap.openstreetmap.fr/fr/map/assemblage-des-randonnees-var_705776" target="_blank" rel="noopener">
               Ouvrir <i class="ti ti-external-link" style="font-size:13px;" aria-hidden="true"></i>
             </a>
+          </div>
+          <div id="record-stats" style="display:none;font-size:12px;color:var(--gris-texte,#666);margin-top:6px">
+            <span id="record-info"></span>
+          </div>
+          <div id="record-export" style="display:none;gap:8px;margin-top:6px">
+            <button onclick="exportTrack('gpx')"
+              style="padding:5px 10px;font-size:12px;font-weight:500;background:#1D9E75;color:#fff;border:none;border-radius:6px;cursor:pointer">
+              Télécharger GPX
+            </button>
+            <button onclick="exportTrack('kml')"
+              style="padding:5px 10px;font-size:12px;font-weight:500;background:#1D9E75;color:#fff;border:none;border-radius:6px;cursor:pointer">
+              Télécharger KML
+            </button>
+            <button onclick="clearTrack()"
+              style="padding:5px 10px;font-size:12px;font-weight:500;background:#888;color:#fff;border:none;border-radius:6px;cursor:pointer">
+              Effacer
+            </button>
           </div>
         </div>
       </div>
