@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Club de randonnée de Carcès — Var">
-  <meta name="theme-color" content="#1D9E75">
+  <meta name="theme-color" content="#1A6B4A">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Rando Var">
@@ -17,6 +17,10 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon192.png">
 
+  <!-- Preconnect Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <!-- Tabler Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
   <!-- CSS local -->
@@ -25,6 +29,18 @@
 <body>
 
 <div id="app">
+  <!-- Splash minimal pendant le chargement CSS/fonts -->
+  <style>
+    #app-splash {
+      position: fixed; inset: 0; background: #1A6B4A;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 999; transition: opacity .3s ease;
+    }
+    #app-splash.fade { opacity: 0; pointer-events: none; }
+  </style>
+  <div id="app-splash">
+    <img src="icons/logo-blanc.png" alt="V.A.R." style="height:60px;width:auto;filter:drop-shadow(0 2px 8px rgba(0,0,0,.3))">
+  </div>
 
   <!-- ===== TOPBAR ===== -->
   <div id="topbar">

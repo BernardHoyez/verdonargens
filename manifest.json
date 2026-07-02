@@ -1,12 +1,12 @@
 {
-  "name": "Rando Var — Club de Carcès",
-  "short_name": "Rando Var",
+  "name": "Verdon Argens Randonnée",
+  "short_name": "V.A.R.",
   "description": "Application du club de randonnée de Carcès (Var)",
   "start_url": "/verdonargens/",
   "scope": "/verdonargens/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1D9E75",
+  "background_color": "#1A6B4A",
+  "theme_color": "#1A6B4A",
   "orientation": "portrait-primary",
   "lang": "fr",
   "icons": [

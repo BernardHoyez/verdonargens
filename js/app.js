@@ -349,6 +349,30 @@ function jourColor(j) {
   return { dimanche:'#1D9E75', mercredi:'#0C447C', vendredi:'#BA7517' }[j] || '#888';
 }
 
+/* ===== SKELETON LOADING ===== */
+function skeletonCard() {
+  return `<div class="rando-card" style="pointer-events:none">
+    <div class="date-col">
+      <div class="skeleton" style="width:28px;height:22px;margin:0 auto 4px"></div>
+      <div class="skeleton" style="width:24px;height:10px;margin:0 auto"></div>
+    </div>
+    <div class="rando-info">
+      <div class="skeleton" style="height:13px;width:75%;margin-bottom:6px"></div>
+      <div class="skeleton" style="height:11px;width:50%"></div>
+    </div>
+  </div>`;
+}
+function showSkeletons() {
+  const nc = document.getElementById('next-cards');
+  const lc = document.getElementById('last-card');
+  if (nc) nc.innerHTML = skeletonCard() + skeletonCard() + skeletonCard();
+  if (lc) lc.innerHTML = skeletonCard();
+  const ht = document.getElementById('hero-title');
+  const he = document.getElementById('hero-eyebrow');
+  if (ht) { ht.innerHTML = '<div class="skeleton" style="height:20px;width:70%;margin-bottom:6px"></div>'; ht.style.opacity='1'; }
+  if (he) he.innerHTML = '<div class="skeleton" style="height:11px;width:40%"></div>';
+}
+
 /* ===== ACCUEIL ===== */
 function renderAccueil() {
   window._sortieIndex = [];
@@ -521,6 +545,7 @@ function closeFormulaire() {
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', () => {
   navTo('accueil');
+  showSkeletons();
   initBandeau();
   loadSorties();
   loadBannieres();
@@ -529,5 +554,14 @@ document.addEventListener('DOMContentLoaded', () => {
     navigator.serviceWorker.register('sw.js')
       .then(r => console.log('[SW] scope:', r.scope))
       .catch(e => console.error('[SW] erreur:', e));
+  }
+
+  /* Disparition du splash screen */
+  const splash = document.getElementById('app-splash');
+  if (splash) {
+    setTimeout(() => {
+      splash.classList.add('fade');
+      setTimeout(() => splash.remove(), 320);
+    }, 400);
   }
 });
