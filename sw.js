@@ -4,7 +4,7 @@
    tous les navigateurs téléchargeront la nouvelle version.
    ============================================================ */
 
-const CACHE_VERSION = 'v1.0.5';
+const CACHE_VERSION = 'v1.0.6';
 const CACHE_NAME    = 'rando-var-' + CACHE_VERSION;
 
 const ASSETS = [
